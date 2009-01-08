@@ -27,7 +27,6 @@ AC_SUBST(DEPS_LIBS)
 
 AC_CONFIG_FILES([
 	Makefile
-	data/Makefile
-	po/Makefile.in])
+	data/Makefile])
 
 AC_OUTPUT

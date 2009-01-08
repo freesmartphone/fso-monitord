@@ -1,0 +1,28 @@
+#!/bin/sh -e
+NAME=fso-monitord
+DEBUG=""
+case "$1" in
+	start)
+		echo -n "starting $NAME: "
+		start-stop-daemon --start --pidfile /var/run/${NAME}.pid \
+		--make-pidfile --background --startas /usr/sbin/$NAME -- \
+		$DEBUG
+		echo "started process with pid `cat /var/run/${NAME}.pid`"
+	;;
+	stop)
+		echo -n "stopping $NAME: "
+		start-stop-daemon --stop --pidfile /var/run/${NAME}.pid \
+		--oknodo
+		rm -f /var/run/${NAME}.pid
+	;;
+	restart)
+		$0 stop
+		sleep 1
+		exec $0 start
+	;;
+	*)
+		echo "Usage: $0 {start|stop}" >&2
+		exit 1
+	;;
+esac
+exit 0

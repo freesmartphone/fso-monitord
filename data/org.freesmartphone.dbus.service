@@ -1,4 +1,0 @@
-[D-BUS Service]
-Name=org.freesmartphone.DBus
-Exec=/usr/local/sbin/dbus-hlid
-User=root
