@@ -39,14 +39,14 @@ string[] stringListToArray( List<string>? theList )
 
 
 //===========================================================================
-public class Introspection : Object
+public class Logger : Object
 {
     private string[] _xmldata;
 
     public List<string> interfaces;
     public List<string> nodes;
 
-    public Introspection( string xmldata )
+    public Logger( string xmldata )
     {
         debug( "introspection object created" );
         _xmldata = xmldata.split( "\n" );
@@ -73,125 +73,20 @@ public class Introspection : Object
 }
 
 //===========================================================================
-[DBus (name = "org.freesmartphone.DBus")]
-public class Server : Object
+public class Monitor : Object
 {
     DBus.Connection conn;
-    dynamic DBus.Object dbus;
+    dynamic DBus.Object ogsmd_device;
 
     construct
     {
         try
         {
-            debug( "server object created" );
+            debug( "monitor object created" );
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
-            dbus = conn.get_object( DBUS_BUS_NAME, DBUS_OBJ_PATH, DBUS_INTERFACE );
+            ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
         } catch (DBus.Error e) {
             error( e.message );
-        }
-    }
-
-    public string[]? ListBusNames()
-    {
-        string[] names = null;
-        try {
-            names = dbus.ListNames();
-        } catch (DBus.Error e) {
-            error( e.message );
-            return names;
-        } catch {
-            return names;
-        }
-        return names;
-    }
-
-    public string[] ListObjectPaths( string? busname ) throws DBus.Error
-    {
-        //
-        // Check whether the given busname is present on the bus
-        //
-        var paths = new List<string>();
-        var existing_busnames = this.ListBusNames();
-        bool found = false;
-        foreach ( string name in existing_busnames )
-        {
-            if ( busname == name )
-            {
-                found = true;
-                break;
-            }
-        }
-        if ( !found )
-        {
-            message( "requested busname '%s' not found.", busname );
-            // FIXME return a dbus error?
-            return stringListToArray( paths );
-        }
-        listObjectPaths( ref paths, busname, "/" );
-        return stringListToArray( paths );
-    }
-
-    private void listObjectPaths( ref List<string> paths, string busname, string objname ) throws DBus.Error
-    {
-        debug( "listObjectPaths: %s, %s", busname, objname );
-        dynamic DBus.Object obj = conn.get_object( busname, objname, DBUS_INTERFACE_INTROSPECTABLE );
-        Introspection data = new Introspection( obj.Introspect() );
-        if ( data.interfaces.length() > 1 ) // we don't count the introspection interface that is always present
-            paths.append( objname );
-        if ( data.nodes.length() > 0 )
-            foreach ( string node in data.nodes )
-            {
-                if ( objname == "/" )
-                    listObjectPaths( ref paths, busname, objname+node );
-                else
-                    listObjectPaths( ref paths, busname, objname+"/"+node );
-            }
-    }
-
-    public string[] ListObjectsByInterface( string busname, string iface ) throws DBus.Error
-    {
-        //
-        // Check whether the given busname is present on the bus
-        //
-        var paths = new List<string>();
-        var existing_busnames = this.ListBusNames();
-        bool found = false;
-        foreach ( string name in existing_busnames )
-        {
-            if ( busname == name )
-            {
-                found = true;
-                break;
-            }
-        }
-        if ( !found )
-        {
-            message( "requested busname '%s' not found.", busname );
-            // FIXME return a dbus error
-            return stringListToArray( paths );
-        }
-        listObjectsByInterface( ref paths, busname, "/", iface );
-        return stringListToArray( paths );
-    }
-
-    private void listObjectsByInterface( ref List<string> paths, string busname, string objname, string iface ) throws DBus.Error
-    {
-        debug( "listObjectsByInterface: %s, %s, %s", busname, objname, iface );
-        dynamic DBus.Object obj = conn.get_object( busname, objname, DBUS_INTERFACE_INTROSPECTABLE );
-        Introspection data = new Introspection( obj.Introspect() );
-        if ( data.interfaces.length() > 1 ) // we don't count the introspection interface that is always present
-            foreach ( string ifacename in data.interfaces )
-            {
-                if ( ifacename == iface )
-                    paths.append( objname );
-            }
-        if ( data.nodes.length() > 0 )
-            foreach ( string node in data.nodes )
-        {
-            if ( objname == "/" )
-                listObjectsByInterface( ref paths, busname, objname+node, iface );
-            else
-                listObjectsByInterface( ref paths, busname, objname+"/"+node, iface );
         }
     }
 }

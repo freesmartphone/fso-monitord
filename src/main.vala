@@ -30,23 +30,8 @@ void main()
 
     try
     {
-        var conn = DBus.Bus.get(DBus.BusType.SYSTEM);
-
-        dynamic DBus.Object bus = conn.get_object( DBUS_BUS_NAME, DBUS_OBJ_PATH, DBUS_INTERFACE );
-        // try to register service in session bus
-        uint request_name_result = bus.request_name( HLID_BUS_NAME, (uint) 0 );
-
-        if (request_name_result == DBus.RequestNameReply.PRIMARY_OWNER)
-        {
-            // start server
-            var server = new Server();
-            conn.register_object( HLID_OBJ_PATH, server );
-            loop.run();
-        }
-        else
-        {
-            stderr.printf( "Can't register bus name. Service already started?\n" );
-        }
+        var monitor = new Monitor();
+        loop.run();
     } catch (Error e) {
         stderr.printf ("Oops: %s\n", e.message);
     }

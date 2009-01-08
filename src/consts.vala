@@ -22,12 +22,12 @@
 //===========================================================================
 namespace CONST
 {
-    public const string DBUS_BUS_NAME  = "org.freedesktop.DBus";
-    public const string DBUS_OBJ_PATH  = "/org/freedesktop/DBus";
-    public const string DBUS_INTERFACE = "org.freedesktop.DBus";
-    public const string DBUS_INTERFACE_INTROSPECTABLE = "org.freedesktop.DBus.Introspectable";
-
-    public const string HLID_BUS_NAME  = "org.freesmartphone.DBus";
-    public const string HLID_OBJ_PATH  = "/org/freesmartphone/DBus";
-    public const string HLID_INTERFACE = "org.freesmartphone.DBus";
+    public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
+    public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
+    public const string FSO_GSM_DEV_IFACE  = "org.freesmartphone.GSM.Device";
+    public const string FSO_GSM_SIM_IFACE  = "org.freesmartphone.GSM.SIM";
+    public const string FSO_GSM_NET_IFACE  = "org.freesmartphone.GSM.Network";
+    public const string FSO_GSM_CALL_IFACE = "org.freesmartphone.GSM.Call";
+    public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
+    public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.Cb";
 }
