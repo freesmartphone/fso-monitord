@@ -33,5 +33,6 @@ namespace CONST
     public const string FSO_GSM_NET_IFACE  = "org.freesmartphone.GSM.Network";
     public const string FSO_GSM_CALL_IFACE = "org.freesmartphone.GSM.Call";
     public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
-    public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.Cb";
+    public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.CellBroadcast";
+    public const string FSO_GSM_MON_IFACE   = "org.freesmartphone.GSM.Monitor";
 }

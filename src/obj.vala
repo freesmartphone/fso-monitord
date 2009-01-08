@@ -78,6 +78,12 @@ public class Monitor : Object
     DBus.Connection conn;
     dynamic DBus.Object framework;
     dynamic DBus.Object ogsmd_device;
+    dynamic DBus.Object ogsmd_sim;
+    dynamic DBus.Object ogsmd_network;
+    dynamic DBus.Object ogsmd_call;
+    dynamic DBus.Object ogsmd_pdp;
+    dynamic DBus.Object ogsmd_cb;
+    dynamic DBus.Object ogsmd_monitor;
 
     construct
     {
@@ -87,9 +93,30 @@ public class Monitor : Object
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
 
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
-            debug( "attached to frameworkd %s", framework.GetVersion() );
+            debug( "attached to frameworkd %s. Gathering objects...", framework.GetVersion() );
 
-            //ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
+            ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
+            ogsmd_device.ThisVersionNotThere();
+
+            ogsmd_sim = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_SIM_IFACE );
+            ogsmd_sim.Ping();
+
+            ogsmd_network = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_NET_IFACE );
+            ogsmd_network.Ping();
+
+            ogsmd_call = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_CALL_IFACE );
+            ogsmd_call.Ping();
+
+            ogsmd_pdp = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_PDP_IFACE );
+            ogsmd_pdp.Ping();
+
+            ogsmd_cb = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_CB_IFACE );
+            ogsmd_cb.Ping();
+
+            ogsmd_monitor = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_MON_IFACE );
+            ogsmd_monitor.Ping();
+
+            debug( "... done." );
 
         } catch (DBus.Error e) {
             error( e.message );
