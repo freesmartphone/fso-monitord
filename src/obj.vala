@@ -76,6 +76,7 @@ public class Logger : Object
 public class Monitor : Object
 {
     DBus.Connection conn;
+    dynamic DBus.Object framework;
     dynamic DBus.Object ogsmd_device;
 
     construct
@@ -84,7 +85,12 @@ public class Monitor : Object
         {
             debug( "monitor object created" );
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
-            ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
+
+            framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
+            debug( "attached to frameworkd %s", framework.GetVersion() );
+
+            //ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
+
         } catch (DBus.Error e) {
             error( e.message );
         }

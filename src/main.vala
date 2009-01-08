@@ -31,6 +31,7 @@ void main()
     try
     {
         var monitor = new Monitor();
+        monitor = monitor; // silence warning
         loop.run();
     } catch (Error e) {
         stderr.printf ("Oops: %s\n", e.message);

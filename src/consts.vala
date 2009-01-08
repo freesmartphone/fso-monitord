@@ -22,6 +22,10 @@
 //===========================================================================
 namespace CONST
 {
+    public const string FSO_FSO_BUS_NAME   = "org.freesmartphone.frameworkd";
+    public const string FSO_FSO_OBJ_PATH   = "/org/freesmartphone/Framework";
+    public const string FSO_FSO_IFACE   = "org.freesmartphone.Framework";
+
     public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
     public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
     public const string FSO_GSM_DEV_IFACE  = "org.freesmartphone.GSM.Device";
