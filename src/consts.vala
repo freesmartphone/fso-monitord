@@ -24,7 +24,15 @@ namespace CONST
 {
     public const string FSO_FSO_BUS_NAME   = "org.freesmartphone.frameworkd";
     public const string FSO_FSO_OBJ_PATH   = "/org/freesmartphone/Framework";
-    public const string FSO_FSO_IFACE   = "org.freesmartphone.Framework";
+    public const string FSO_FSO_IFACE      = "org.freesmartphone.Framework";
+
+    public const string FSO_TEST_BUS_NAME   = "org.freesmartphone.testing";
+    public const string FSO_TEST_OBJ_PATH   = "/org/freesmartphone/Testing";
+    public const string FSO_TEST_IFACE      = "org.freesmartphone.Testing";
+
+    public const string FSO_USAGE_BUS_NAME = "org.freesmartphone.ousaged";
+    public const string FSO_USAGE_OBJ_PATH = "/org/freesmartphone/Usage";
+    public const string FSO_USAGE_IFACE    = "org.freesmartphone.Usage";
 
     public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
     public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
@@ -34,5 +42,5 @@ namespace CONST
     public const string FSO_GSM_CALL_IFACE = "org.freesmartphone.GSM.Call";
     public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
     public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.CellBroadcast";
-    public const string FSO_GSM_MON_IFACE   = "org.freesmartphone.GSM.Monitor";
+    public const string FSO_GSM_MON_IFACE  = "org.freesmartphone.GSM.Monitor";
 }

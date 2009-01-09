@@ -41,42 +41,32 @@ string[] stringListToArray( List<string>? theList )
 //===========================================================================
 public class Logger : Object
 {
-    private string[] _xmldata;
-
-    public List<string> interfaces;
-    public List<string> nodes;
-
-    public Logger( string xmldata )
+    public Logger()
     {
-        debug( "introspection object created" );
-        _xmldata = xmldata.split( "\n" );
-
-        foreach ( string line in _xmldata )
-        {
-            //debug( "dealing with line '%s'", line );
-            int res = 0;
-            string name;
-            res = line.scanf( "  <node name=\"%a[a-zA-Z0-9_]\"/>", out name );
-            if ( res == 1 )
-            {
-                nodes.append( name );
-                message( "object has node '%s'", name );
-            }
-            res = line.scanf( "  <interface name=\"%a[a-zA-Z0-9_.]\">", out name );
-            if ( res == 1 )
-            {
-                message( "object supports interface '%s'", name );
-                interfaces.append( name );
-            }
-        }
     }
+
+    public void testing_test( dynamic DBus.Object sender, HashTable<string,Value?> dict, Value? foo )
+    {
+        debug( "message" );
+    }
+
+    public void network_status()
+    {
+        debug( "gsm: network_status" );
+    }
+
 }
+
 
 //===========================================================================
 public class Monitor : Object
 {
     DBus.Connection conn;
+
     dynamic DBus.Object framework;
+    dynamic DBus.Object testing;
+    dynamic DBus.Object usage;
+
     dynamic DBus.Object ogsmd_device;
     dynamic DBus.Object ogsmd_sim;
     dynamic DBus.Object ogsmd_network;
@@ -85,8 +75,12 @@ public class Monitor : Object
     dynamic DBus.Object ogsmd_cb;
     dynamic DBus.Object ogsmd_monitor;
 
+    Logger logger;
+
     construct
     {
+        logger = new Logger();
+
         try
         {
             debug( "monitor object created" );
@@ -95,8 +89,16 @@ public class Monitor : Object
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
             debug( "attached to frameworkd %s. Gathering objects...", framework.GetVersion() );
 
-            ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
-            ogsmd_device.ThisVersionNotThere();
+            /*
+            usage = conn.get_object( FSO_USAGE_BUS_NAME, FSO_USAGE_OBJ_PATH, FSO_USAGE_IFACE );
+            usage.ResourceAvailable += logger.usage_resource_available;
+            */
+
+            testing = conn.get_object( FSO_TEST_BUS_NAME, FSO_TEST_OBJ_PATH, FSO_TEST_IFACE );
+            testing.Test += logger.testing_test;
+
+            //ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
+            //ogsmd_device.ThisVersionNotThere();
 
             ogsmd_sim = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_SIM_IFACE );
             ogsmd_sim.Ping();
@@ -122,4 +124,5 @@ public class Monitor : Object
             error( e.message );
         }
     }
+
 }
