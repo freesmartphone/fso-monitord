@@ -45,7 +45,9 @@ public class Logger : Object
     {
     }
 
-    public void testing_test( dynamic DBus.Object sender, HashTable<string,Value?> dict, Value? foo )
+    // Signals with complex types do not work yet :/ See
+    // http://mail.gnome.org/archives/vala-list/2009-January/msg00033.html
+    public void testing_test( dynamic DBus.Object sender, HashTable<string,Value?> foo )
     {
         debug( "message" );
     }
