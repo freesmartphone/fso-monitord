@@ -41,21 +41,64 @@ string[] stringListToArray( List<string>? theList )
 //===========================================================================
 public class Logger : Object
 {
+    /* public */
+
     public Logger()
     {
+        logINFO( "logger restarted" );
     }
 
-    // Signals with complex types do not work yet :/ See
-    // http://mail.gnome.org/archives/vala-list/2009-January/msg00033.html
-    public void testing_test( dynamic DBus.Object sender, HashTable<string,Value?> foo )
+    public void testing_test( dynamic DBus.Object sender, HashTable<string,Value?> hashtable )
     {
-        debug( "message" );
+        debug( "message received w/ hash table." );
+        var value1 = hashtable.lookup( "yo" );
+        assert( value1 != null );
+        var value2 = hashtable.lookup( "bar" );
+        assert( value2 == null );
     }
 
     public void network_status()
     {
         debug( "gsm: network_status" );
     }
+
+    /* private */
+
+    private void logDATA( string msg )
+    {
+        log( "DATA", msg );
+    }
+
+    private void logINFO( string msg )
+    {
+        log( "INFO", msg );
+    }
+
+    private void log( string cat, string msg )
+    {
+        if ( stream == null )
+        {
+            stream = FileStream.open( "/tmp/fso-monitord.log", "a" );
+        }
+        if ( stream == null )
+        {
+            error( "can't open filestream -- not logging" );
+        }
+        else
+        {
+            var tv = TimeVal();
+            string time = tv.to_iso8601();
+            stream.puts( time );
+            stream.putc( ' ' );
+            stream.puts( cat );
+            stream.putc( ' ' );
+            stream.puts( msg );
+            stream.putc( '\n' );
+            stream.flush();
+        }
+    }
+
+    private FileStream stream;
 
 }
 
