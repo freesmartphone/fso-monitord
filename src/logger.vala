@@ -1,5 +1,5 @@
 /*
- * main.vala
+ * logger.vala
  *
  * Authored by Michael 'Mickey' Lauer <mlauer@vanille-media.de>
  *
@@ -23,20 +23,37 @@
 using GLib;
 using CONST;
 
-//===========================================================================
-void main()
-{
-    var logger = new Logger();
-    GLib.Log.set_default_handler(logger.log);
-    var loop = new MainLoop(null, false);
 
-    try
+
+//===========================================================================
+public class Logger : Object
+{
+
+    /* public */
+
+    public Logger(string logfile = "/tmp/fso-monitor.log" )
     {
-        var monitor = new Monitor();
-        monitor = monitor; // silence warning
-        loop.run();
-    } catch (Error e) {
-        stderr.printf ("Oops: %s\n", e.message);
+    this.log_path = logfile;
+        this.stream = FileStream.open( this.log_path, "a+" );
+    if( this.stream == null)
+    {
+        error("Can't open %s", this.log_path);
     }
+
+        log("INFO", 0, "logger restarted" );
+    }
+
+
+    public void log (string? log_domain, LogLevelFlags flags,string message) 
+    {
+        var tv = TimeVal();
+        string time = tv.to_iso8601();
+        stream.printf("%s %s %s\n", time, log_domain, message);
+        stream.flush();
+    }
+    /* private */
+    private FileStream stream;
+    private string log_path;
+
 }
 
