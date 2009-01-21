@@ -24,10 +24,9 @@ using GLib;
 using CONST;
 
 //===========================================================================
-void main()
+int main(string[] args)
 {
     var logger = new Logger();
-    GLib.Log.set_default_handler(logger.log);
     var loop = new MainLoop(null, false);
 
     try
@@ -37,6 +36,8 @@ void main()
         loop.run();
     } catch (Error e) {
         stderr.printf ("Oops: %s\n", e.message);
+		return 1;
     }
+	return 0;
 }
 

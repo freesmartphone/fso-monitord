@@ -16,7 +16,8 @@ BUILT_SOURCES = src/.vala.stamp
 sbin_PROGRAMS = fso-monitord
 
 fso_monitord_VALASOURCES = \
-	src/obj.vala \
+	src/logger.vala \
+	src/monitor.vala \
 	src/main.vala \
 	src/consts.vala \
 	$(NULL)

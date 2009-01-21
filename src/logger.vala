@@ -33,27 +33,34 @@ public class Logger : Object
 
     public Logger(string logfile = "/tmp/fso-monitor.log" )
     {
-    this.log_path = logfile;
-        this.stream = FileStream.open( this.log_path, "a+" );
-    if( this.stream == null)
-    {
-        error("Can't open %s", this.log_path);
+        this.log_path = logfile;
+            this.stream = FileStream.open( this.log_path, "a+" );
+        if( this.stream == null)
+        {
+            error("Can't open %s", this.log_path);
+        }
+
+        log("INFO",  "logger restarted" );
     }
+	public void logDATA( string message )
+	{
+		log("DATA", message);
+	}
+	public void logINFO( string message)
+	{
+		log("INFO", message );
+	}
 
-        log("INFO", 0, "logger restarted" );
-    }
 
-
-    public void log (string? log_domain, LogLevelFlags flags,string message) 
+    public void log (string? log_domain, string message) 
     {
         var tv = TimeVal();
         string time = tv.to_iso8601();
-        stream.printf("%s %s %s\n", time, log_domain, message);
+        stream.printf("%s: %s %s\n", time, log_domain, message);
         stream.flush();
     }
     /* private */
     private FileStream stream;
     private string log_path;
-
 }
 

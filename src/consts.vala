@@ -43,4 +43,12 @@ namespace CONST
     public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
     public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.CellBroadcast";
     public const string FSO_GSM_MON_IFACE  = "org.freesmartphone.GSM.Monitor";
+	public const string FSO_GSM_HZ_IFACE   = "org.freesmartphone.GSM.HZ";
+	public const string FSO_GSM_SMS_IFACE   = "org.freesmartphone.GSM.SMS";
+
+	public const string FDO_GYPSY_ACCURACY_IFACE = "org.freedesktop.Gypsy.Accuracy";
+	public const string FDO_GYPSY_COURSE_IFACE = "org.freedesktop.Gypsy.Course";
+	public const string FDO_GYPSY_DEVICE_IFACE = "org.freedesktop.Gypsy.Device";
+	public const string FDO_GYPSY_POSITION_IFACE = "org.freedesktop.Gypsy.Position";
+	public const string FDO_GYPSY_TIME_IFACE = "org.freedesktop.Gypsy.Time";
 }
