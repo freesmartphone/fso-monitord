@@ -71,6 +71,7 @@ public class Monitor : Object
     dynamic DBus.Object framework;
     //dynamic DBus.Object testing;
     dynamic DBus.Object usage;
+    dynamic DBus.Object powersupply;
 
     dynamic DBus.Object ogsmd_device;
     dynamic DBus.Object ogsmd_sim;
@@ -81,9 +82,9 @@ public class Monitor : Object
     dynamic DBus.Object ogsmd_hz;
     //dynamic DBus.Object ogsmd_monitor;
     dynamic DBus.Object ogsmd_sms;
+
     dynamic DBus.Object ophoned;
     dynamic DBus.Object ophoned_call;
-
 
     string current_call_status;
     string current_idle_status;
@@ -96,8 +97,6 @@ public class Monitor : Object
 
     HashTable<string,string> current_network_status;
 
-
-
     construct
     {
         try
@@ -107,14 +106,16 @@ public class Monitor : Object
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
 
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
-            debug( "attached to frameworkd %s. Gathering objects...", framework.GetVersion() );
-
+            debug( "Attached to frameworkd %s. Gathering objects...", framework.GetVersion() );
 
             usage = conn.get_object( FSO_USAGE_BUS_NAME, FSO_USAGE_OBJ_PATH, FSO_USAGE_IFACE );
             usage.ResourceAvailable += this.usage_resource_available;
             usage.ResourceChanged += this.usage_resource_changed;
             usage.SystemAction += this.usage_system_action;
 
+            powersupply = conn.get_object( FSO_DEV_BUS_NAME, FSO_DEV_POWER_OBJ_PATH, FSO_DEV_POWER_IFACE );
+            powersupply.Status += this.powersupply_status;
+            powersupply.Capacity += this.powersupply_capacity;
 
             //testing = conn.get_object( FSO_TEST_BUS_NAME, FSO_TEST_OBJ_PATH, FSO_TEST_IFACE );
 
@@ -150,14 +151,15 @@ public class Monitor : Object
             ogsmd_cb.IncomingCellBroadcast += this.incoming_cb;
             ogsmd_cb.Ping();
 
-            ogsmd_hz = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_HZ_IFACE );
-            ogsmd_hz.HomeZoneStatus += this.home_zone_changed;
-            ogsmd_hz.GetHomeZoneStatus(this.get_home_zone);
-            ogsmd_hz.Ping();
-
             ogsmd_sms = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_SMS_IFACE );
             ogsmd_sms.IncomingMessage += this.sms_incoming_message;
             ogsmd_sms.Ping();
+
+            // HZ is exported by org/freesmartphone/GSM/Server
+            ogsmd_hz = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_PHONE_OBJ_PATH, FSO_GSM_HZ_IFACE );
+            ogsmd_hz.HomeZoneStatus += this.home_zone_changed;
+            ogsmd_hz.GetHomeZoneStatus(this.get_home_zone);
+            ogsmd_hz.Ping();
 
 
             //ogsmd_monitor = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_MON_IFACE );
@@ -173,7 +175,10 @@ public class Monitor : Object
             error( e.message );
         }
     }
-    //GSM.Usage--------------------------------------------------------------------
+
+    //
+    // org.freesmartphone.Usage
+    //
     private void usage_resource_available( dynamic DBus.Object obj, string name, bool state)
     {
         logger.log("USAGE", "Resource available: name:'" + name + "' state: " + state.to_string() );
@@ -197,8 +202,21 @@ public class Monitor : Object
         this.logger.log("USAGE", "System action: " + action);
     }
 
+    //
+    // org.freesmartphone.Device
+    //
+    private void powersupply_status( dynamic DBus.Object obj, string status )
+    {
+        logger.log("DEVICE", "Power Status: " + status );
+    }
+    private void powersupply_capacity( dynamic DBus.Object obj, int capacity )
+    {
+        logger.log("DEVICE", "Power Capacity: " + capacity.to_string() );
+    }
 
-    //GSM.SMS----------------------------------------------------------------------
+    //
+    // org.freesmartphone.GSM.SMS
+    //
     private void sms_incoming_message(dynamic DBus.Object obj, string sender, string content, HashTable<string,Value?> properties)
     {
         this.logger.log("SMS", "Incoming message. sender:" + sender + "content: " + content );
@@ -212,7 +230,10 @@ public class Monitor : Object
     {
         this.logger.log( "SMS", key + ": " + value_to_string(value) );
     }
-    //GSM.SIM----------------------------------------------------------------------
+
+    //
+    // org.freesmartphone.GSM.SIM
+    //
     private void sim_auth_status_changed(dynamic DBus.Object obj, string status)
     {
         log("SIM", 0, "Auth status changed: %s -> %s", this.current_auth_status, status);
@@ -235,7 +256,10 @@ public class Monitor : Object
     {
         this.logger.log("SIM", "New stored message at " + idx.to_string() );
     }
-    //GSM.PDP----------------------------------------------------------------------
+
+    //
+    // org.freesmartphone.GSM.PDP
+    //
     private void pdp_context_status_changed( dynamic DBus.Object obj, int id, string status, HashTable<string,Value?> properties)
     {
         this.logger.log("PDP", "Context status changed. ID: "+ id.to_string() + " status: " +status );
@@ -283,7 +307,9 @@ public class Monitor : Object
         //How could we figure out if an element is gone?
     }
 
-    //GSM.HZ-----------------------------------------------------------------------
+    //
+    // org.freesmartphone.GSM.HZ
+    //
     private void get_home_zone(dynamic DBus.Object obj, string zone, GLib.Error error)
     {
         if( error != null)
@@ -302,7 +328,10 @@ public class Monitor : Object
         this.logger.log("HZ", "Homezone changed: " + this.current_home_zone + "->" + zone);
         this.current_home_zone = zone;
     }
-    //GSM.Network ------------------------------------------------------------------
+
+    //
+    // org.freesmartphone.GSM.Network
+    //
     private void cipher_status_changed(dynamic DBus.Object obj, string gsm, string gprs )
     {
 
@@ -348,7 +377,9 @@ public class Monitor : Object
         logger.log("NETWORK", key + ": " + value_to_string(value) );
     }
 
-    //GSM.Call----------------------------------------------------------------------
+    //
+    // org.freesmartphone.GSM.Call
+    //
     public void call_status_changed( dynamic DBus.Object obj, int id,
             string status, GLib.HashTable<string,Value?> properties)
     {
@@ -377,24 +408,24 @@ public class Monitor : Object
             this.current_call_status = status;
         }
     }
-    //GSM.CB-----------------------------------------------------------------------
+
+    //
+    // org.freesmartphone.GSM.CB
+    //
     private void incoming_cb(dynamic DBus.Object obj, int serial, int channel,
             int encoding, int page, string data)
     {
         log("CB", 0,"Received CB with serial %i on channel %i. Encoding %i Page: %i Data: %s",
             serial,channel, encoding, page,data);
     }
-    //GPS----------------------------------------------------------------------
 
+    //
+    // org.freedesktop.Gypsy.Accuracy
+    //
     public void accuracy_changed(DBus.Object obj)
     {
         log("GPS", 0,"Accuracy changed");
     }
-    //IdleState-----------------------------------------------------------------
-    public void idle_state_changed(DBus.Object obj, string status)
-    {
-        log("IdleNotifier", 0,"State changed: %s -> %s",this.current_idle_status, status);
-        this.current_idle_status = status;
-    }
+
 }
 

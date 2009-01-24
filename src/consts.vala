@@ -35,8 +35,8 @@ namespace CONST
     public const string FSO_USAGE_IFACE    = "org.freesmartphone.Usage";
 
     public const string FSO_DEV_BUS_NAME = "org.freesmartphone.odeviced";
-    public const string FSO_DEV_BAT_OBJ_PATH = "/org/freesmartphone/Device/PowerSupply/battery";
-    public const string FSO_DEV_BAT_IFACE    = "org.freesmartphone.Device.PowerSupply";
+    public const string FSO_DEV_POWER_OBJ_PATH = "/org/freesmartphone/Device/PowerSupply/battery";
+    public const string FSO_DEV_POWER_IFACE    = "org.freesmartphone.Device.PowerSupply";
 
     public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
     public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
@@ -47,12 +47,13 @@ namespace CONST
     public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
     public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.CellBroadcast";
     public const string FSO_GSM_MON_IFACE  = "org.freesmartphone.GSM.Monitor";
-	public const string FSO_GSM_HZ_IFACE   = "org.freesmartphone.GSM.HZ";
-	public const string FSO_GSM_SMS_IFACE   = "org.freesmartphone.GSM.SMS";
+    public const string FSO_GSM_SMS_IFACE   = "org.freesmartphone.GSM.SMS";
+    public const string FSO_GSM_PHONE_OBJ_PATH   = "/org/freesmartphone/GSM/Server";
+    public const string FSO_GSM_HZ_IFACE   = "org.freesmartphone.GSM.HZ";
 
-	public const string FDO_GYPSY_ACCURACY_IFACE = "org.freedesktop.Gypsy.Accuracy";
-	public const string FDO_GYPSY_COURSE_IFACE = "org.freedesktop.Gypsy.Course";
-	public const string FDO_GYPSY_DEVICE_IFACE = "org.freedesktop.Gypsy.Device";
-	public const string FDO_GYPSY_POSITION_IFACE = "org.freedesktop.Gypsy.Position";
-	public const string FDO_GYPSY_TIME_IFACE = "org.freedesktop.Gypsy.Time";
+    public const string FDO_GYPSY_ACCURACY_IFACE = "org.freedesktop.Gypsy.Accuracy";
+    public const string FDO_GYPSY_COURSE_IFACE = "org.freedesktop.Gypsy.Course";
+    public const string FDO_GYPSY_DEVICE_IFACE = "org.freedesktop.Gypsy.Device";
+    public const string FDO_GYPSY_POSITION_IFACE = "org.freedesktop.Gypsy.Position";
+    public const string FDO_GYPSY_TIME_IFACE = "org.freedesktop.Gypsy.Time";
 }
