@@ -34,6 +34,10 @@ namespace CONST
     public const string FSO_USAGE_OBJ_PATH = "/org/freesmartphone/Usage";
     public const string FSO_USAGE_IFACE    = "org.freesmartphone.Usage";
 
+    public const string FSO_DEV_BUS_NAME = "org.freesmartphone.odeviced";
+    public const string FSO_DEV_BAT_OBJ_PATH = "/org/freesmartphone/Device/PowerSupply/battery";
+    public const string FSO_DEV_BAT_IFACE    = "org.freesmartphone.Device.PowerSupply";
+
     public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
     public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
     public const string FSO_GSM_DEV_IFACE  = "org.freesmartphone.GSM.Device";
