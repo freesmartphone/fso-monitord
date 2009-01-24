@@ -1,4 +1,4 @@
 initdir = $(sysconfdir)/init.d
-dist_init_DATA = fso-monitord
+init_SCRIPTS = fso-monitord
 
-MAINTAINERCLEANFILES = Makefile.in
+MAINTAINERCLEANFILES = Makefile.in $(init_SCRIPTS)
