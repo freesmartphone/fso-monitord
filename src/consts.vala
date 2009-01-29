@@ -34,12 +34,10 @@ namespace CONST
     public const string FSO_USAGE_OBJ_PATH = "/org/freesmartphone/Usage";
     public const string FSO_USAGE_IFACE    = "org.freesmartphone.Usage";
 
-    public const string FSO_DEV_BUS_NAME = "org.freesmartphone.odeviced";
-    public const string FSO_DEV_POWER_OBJ_PATH = "/org/freesmartphone/Device/PowerSupply/battery";
-    public const string FSO_DEV_POWER_IFACE    = "org.freesmartphone.Device.PowerSupply";
 
     public const string FSO_GSM_BUS_NAME   = "org.freesmartphone.ogsmd";
     public const string FSO_GSM_OBJ_PATH   = "/org/freesmartphone/GSM/Device";
+    public const string FSO_GSM_PHONE_OBJ_PATH   = "/org/freesmartphone/GSM/Server";
     public const string FSO_GSM_DEV_IFACE  = "org.freesmartphone.GSM.Device";
     public const string FSO_GSM_SIM_IFACE  = "org.freesmartphone.GSM.SIM";
     public const string FSO_GSM_NET_IFACE  = "org.freesmartphone.GSM.Network";
@@ -47,9 +45,23 @@ namespace CONST
     public const string FSO_GSM_PDP_IFACE  = "org.freesmartphone.GSM.Pdp";
     public const string FSO_GSM_CB_IFACE   = "org.freesmartphone.GSM.CellBroadcast";
     public const string FSO_GSM_MON_IFACE  = "org.freesmartphone.GSM.Monitor";
-    public const string FSO_GSM_SMS_IFACE   = "org.freesmartphone.GSM.SMS";
-    public const string FSO_GSM_PHONE_OBJ_PATH   = "/org/freesmartphone/GSM/Server";
     public const string FSO_GSM_HZ_IFACE   = "org.freesmartphone.GSM.HZ";
+    public const string FSO_GSM_SMS_IFACE   = "org.freesmartphone.GSM.SMS";
+
+    public const string FSO_DEV_BUS_NAME = "org.freesmartphone.odeviced";
+    public const string FSO_DEV_OBJ_PATH = "/org/freesmartphone/Device/";
+    public const string FSO_DEV_AUDIO_IFACE = "org.freesmartphone.Device.Audio";
+    public const string FSO_DEV_AUDIO_OBJ_PATH = "/org/freesmartphone/Device/Audio";
+    public const string FSO_DEV_IDLE_IFACE = "org.freesmartphone.Device.IdleNotifier";
+    public const string FSO_DEV_INPUT_IFACE = "org.freesmartphone.Device.Input";
+    public const string FSO_DEV_INPUT_OBJ_PATH = "/org/freesmartphone/Device/Input";
+    public const string FSO_DEV_POWER_CONTROL_IFACE = "org.freesmartphone.Device.PowerControl";
+    public const string FSO_DEV_PC_BT_OBJ_PATH = "/org/freesmartphone/Device/PowerControl/Bluetooth";
+    public const string FSO_DEV_PC_USB_OBJ_PATH = "/org/freesmartphone/Device/Control/UsbHost";
+    public const string FSO_DEV_PC_WIFI_OBJ_PATH = "/org/freesmartphone/Device/PowerControl/WiFi";
+    public const string FSO_DEV_POWER_SUPPLY_IFACE = "org.freesmartphone.Device.PowerSupply";
+    public const string FSO_DEV_POWER_SUPPLY_OBJ_PATH = "/org/freesmartphone/Device/PowerSupply/battery";
+
 
     public const string FDO_GYPSY_ACCURACY_IFACE = "org.freedesktop.Gypsy.Accuracy";
     public const string FDO_GYPSY_COURSE_IFACE = "org.freedesktop.Gypsy.Course";

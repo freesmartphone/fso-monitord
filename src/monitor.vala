@@ -52,6 +52,22 @@ string value_to_string( Value value )
     {
         val = value.get_boolean().to_string();
     }
+    else if( value.holds( typeof( uint ) ) )
+    {
+        val = value.get_uint().to_string();
+    }
+    else if( value.holds( typeof( double ) ) )
+    {
+        val = value.get_double().to_string();
+    }
+    else if( value.holds( typeof( float ) ) )
+    {
+        val = value.get_float().to_string();
+    }
+    else if( value.holds( typeof( char ) ) )
+    {
+        val = value.get_char().to_string();
+    }
     else
     {
         val = "unknown type: " + value.type_name();
@@ -65,44 +81,58 @@ string value_to_string( Value value )
 public class Monitor : Object
 {
     /*private members*/
-    DBus.Connection conn;
-    Logger logger;
+    private DBus.Connection conn;
+    private Logger logger;
 
-    dynamic DBus.Object framework;
-    //dynamic DBus.Object testing;
-    dynamic DBus.Object usage;
-    dynamic DBus.Object powersupply;
+    private dynamic DBus.Object framework;
+    private dynamic DBus.Object usage;
+    private dynamic DBus.Object powersupply;
 
-    dynamic DBus.Object ogsmd_device;
-    dynamic DBus.Object ogsmd_sim;
-    dynamic DBus.Object ogsmd_network;
-    dynamic DBus.Object ogsmd_call;
-    dynamic DBus.Object ogsmd_pdp;
-    dynamic DBus.Object ogsmd_cb;
-    dynamic DBus.Object ogsmd_hz;
-    //dynamic DBus.Object ogsmd_monitor;
-    dynamic DBus.Object ogsmd_sms;
+    private dynamic DBus.Object ogsmd_device;
+    private dynamic DBus.Object ogsmd_sim;
+    private dynamic DBus.Object ogsmd_network;
+    private dynamic DBus.Object ogsmd_call;
+    private dynamic DBus.Object ogsmd_pdp;
+    private dynamic DBus.Object ogsmd_cb;
+    private dynamic DBus.Object ogsmd_hz;
+    private dynamic DBus.Object ogsmd_sms;
 
-    dynamic DBus.Object ophoned;
-    dynamic DBus.Object ophoned_call;
+    private dynamic DBus.Object ophoned;
+    private dynamic DBus.Object ophoned_call;
 
-    string current_call_status;
-    string current_idle_status;
-    string current_home_zone;
-    string current_auth_status;
-    string current_gsm_cipher;
-    string current_gprs_cipher;
-    //string current_context_status;
-    int current_signal_strength;
+    private dynamic DBus.Object odeviced;
+    private dynamic DBus.Object odeviced_audio;
+    private dynamic DBus.Object odeviced_input;
+    private dynamic DBus.Object odeviced_power_supply;
+    private dynamic DBus.Object odeviced_power_cntl_usb;
+    private dynamic DBus.Object odeviced_power_cntl_wifi;
+    private dynamic DBus.Object odeviced_power_cntl_bt;
 
-    HashTable<string,string> current_network_status;
+    
+    private string current_call_status;
+    private string current_home_zone;
+    private string current_auth_status;
+    private string current_gsm_cipher;
+    private string current_gprs_cipher;
+    private string current_scenario;
+    private string current_power_status;
+
+    private int current_signal_strength;
+    private int current_capacity;
+
+
+    private bool current_power_bt;
+    private bool current_power_usb;
+    private bool current_power_wifi;
+
+    private HashTable<string,string> current_network_status;
 
     construct
     {
         try
         {
             logger = new Logger();
-            debug( "---------------Monitor restarted----------------" );
+            logger.logINFO( "---------------Monitor restarted----------------" );
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
 
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
@@ -113,11 +143,9 @@ public class Monitor : Object
             usage.ResourceChanged += this.usage_resource_changed;
             usage.SystemAction += this.usage_system_action;
 
-            powersupply = conn.get_object( FSO_DEV_BUS_NAME, FSO_DEV_POWER_OBJ_PATH, FSO_DEV_POWER_IFACE );
+            powersupply = conn.get_object( FSO_DEV_BUS_NAME, FSO_DEV_POWER_SUPPLY_OBJ_PATH, FSO_DEV_POWER_SUPPLY_IFACE );
             powersupply.Status += this.powersupply_status;
             powersupply.Capacity += this.powersupply_capacity;
-
-            //testing = conn.get_object( FSO_TEST_BUS_NAME, FSO_TEST_OBJ_PATH, FSO_TEST_IFACE );
 
             ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
             ogsmd_device.ThisVersionNotThere();
@@ -155,6 +183,38 @@ public class Monitor : Object
             ogsmd_sms.IncomingMessage += this.sms_incoming_message;
             ogsmd_sms.Ping();
 
+            odeviced_audio = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_AUDIO_OBJ_PATH, FSO_DEV_AUDIO_IFACE );
+            odeviced_audio.SoundStatus += this.sound_status_changed;
+            odeviced_audio.Scenario += this.scenario_changed;
+            odeviced_audio.GetScenario ( this.get_scenario );
+            odeviced_audio.Ping();
+
+            odeviced_input = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_INPUT_OBJ_PATH, FSO_DEV_INPUT_IFACE );
+            odeviced_input.Event += this.input_event;
+            odeviced_input.Ping();
+
+            odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_USB_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
+            odeviced_power_cntl_usb.GetPower( this.get_power_usb );
+            odeviced_power_cntl_usb.Power += this.power_changed_usb;
+            odeviced_power_cntl_usb.Ping();
+
+            odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_WIFI_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
+            odeviced_power_cntl_wifi.GetPower( this.get_power_wifi );
+            odeviced_power_cntl_wifi.Power += this.power_changed_wifi;
+            odeviced_power_cntl_wifi.Ping();
+
+            odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_BT_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
+            odeviced_power_cntl_bt.GetPower( this.get_power_bt );
+            odeviced_power_cntl_bt.Power += this.power_changed_bt;
+            odeviced_power_cntl_wifi.Ping();
+
+
+            odeviced_power_supply = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_POWER_SUPPLY_OBJ_PATH, FSO_DEV_POWER_SUPPLY_IFACE );
+            odeviced_power_supply.PowerStatus += this.power_status_changed;
+            odeviced_power_supply.GetPowerStatus( this.get_power_status );
+            odeviced_power_supply.Capacity += this.capacity_changed;
+            odeviced_power_supply.GetCapacity( this.get_capacity );
+            odeviced_power_supply.Ping();
             // HZ is exported by org/freesmartphone/GSM/Server
             ogsmd_hz = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_PHONE_OBJ_PATH, FSO_GSM_HZ_IFACE );
             ogsmd_hz.HomeZoneStatus += this.home_zone_changed;
@@ -175,6 +235,144 @@ public class Monitor : Object
             error( e.message );
         }
     }
+    //
+    //org.freedesktop.Device.Audio
+    //
+    private void sound_status_changed( dynamic DBus.Object obj, string id, string status, HashTable<string,Value?> properties )
+    {
+        logger.log("DEVICE.AUDIO", "Status :" + id + ": " + status);
+        //ignoring properties: not yet defined
+    }
+    private void scenario_changed( dynamic DBus.Object obj, string scenario)
+    {
+        logger.log("DEVICE.AUDIO", "Scenario changed: " + this.current_scenario + "->" + scenario);
+        this.current_scenario = scenario;
+    }
+    private void get_scenario( dynamic DBus.Object obj, string s, GLib.Error error )
+    {
+        if( error != null )
+        {
+            debug("Can't get scenario " + error.message );
+            this.current_scenario = "UNKNOWN";
+        }
+        else
+        {
+            this.current_scenario = s;
+        }
+    }
+
+    //
+    //org.freedesktop.Device.Input
+    //
+    private void input_event( dynamic DBus.Object obj, string name, string action, int seconds)
+    {
+        logger.log("DEVICE.INPUT", "Event: " + name + action + seconds.to_string());    
+    }
+
+    //
+    //org.freesmartphone.Device.PowerControl
+    //
+    private void power_changed_usb( dynamic DBus.Object obj, bool on)
+    {
+        logger.log("DEVICE", "USB Power: " + this.current_power_usb.to_string() + "->" + on.to_string());    
+        this.current_power_usb = on;
+    }
+
+    private void get_power_usb( dynamic DBus.Object obj, bool on, GLib.Error error)
+    {
+        if( error != null )
+        {
+            debug("Can't get USB Power" + error.message );
+            //Let's say no to have a defined state
+            this.current_power_usb = false;
+        }
+        else
+        {
+            this.current_power_usb = on;
+        }
+        
+    }
+
+    private void power_changed_wifi( dynamic DBus.Object obj, bool on)
+    {
+        logger.log("DEVICE", "WiFi Power: " + this.current_power_wifi.to_string() + "->" + on.to_string());    
+        this.current_power_wifi = on;
+    }
+
+    private void get_power_wifi( dynamic DBus.Object obj, bool on, GLib.Error error)
+    {
+        if( error != null )
+        {
+            debug("Can't get Power" + error.message );
+            //Let's say no to have a defined state
+            this.current_power_wifi = false;
+        }
+        else
+        {
+            this.current_power_wifi = on;
+        }
+        
+    }
+
+    private void power_changed_bt( dynamic DBus.Object obj, bool on)
+    {
+        logger.log("DEVICE", "Bluetooth Power: " + this.current_power_bt.to_string() + "->" + on.to_string());    
+        this.current_power_bt = on;
+    }
+
+    private void get_power_bt( dynamic DBus.Object obj, bool on, GLib.Error error)
+    {
+        if( error != null )
+        {
+            debug("Can't get Bluetooth Power" + error.message );
+            //Let's say no to have a defined state
+            this.current_power_bt = false;
+        }
+        else
+        {
+            this.current_power_bt = on;
+        }
+        
+    }
+
+    //
+    //org.freedesktop.Device.PowerSupply 
+    //
+    private void power_status_changed( dynamic DBus.Object obj, string status)
+    {
+        logger.log( "POWERSUPPLY", "PowerStatus changed" + this.current_power_status + "->" + status );
+        this.current_power_status = status;
+    }
+    private void get_power_status( dynamic DBus.Object obj, string status, GLib.Error error)
+    {
+        if( error != null )
+        {
+            debug( "Can't get power status: " + error.message );
+            this.current_power_status = "unknown";
+        }
+        else
+        {
+            this.current_power_status = status;
+        }
+    }
+    private void capacity_changed( dynamic DBus.Object obj, int status )
+    {
+        logger.log( "POWERSUPPLY", "Capacity changed: " + this.current_capacity.to_string() + "->" + status.to_string() );
+        this.current_capacity = status;
+    }
+    private void get_capacity( dynamic DBus.Object obj, int capacity, GLib.Error error )
+    {
+        if ( error != null )
+        {
+            debug("Can't get capacity: " + error.message );
+            this.current_capacity = -1;
+        }
+        else
+        {
+            this.current_capacity = capacity;
+        }
+    }
+
 
     //
     // org.freesmartphone.Usage
@@ -236,12 +434,11 @@ public class Monitor : Object
     //
     private void sim_auth_status_changed(dynamic DBus.Object obj, string status)
     {
-        log("SIM", 0, "Auth status changed: %s -> %s", this.current_auth_status, status);
+        logger.log("SIM", "Auth status changed: " +  this.current_auth_status + "->" + status);
         this.current_auth_status = status;
     }
     private void sim_get_auth_status( dynamic DBus.Object obj, string status, GLib.Error error)
     {
-        string msg = null;
         if( error != null)
         {
             log( "Can't get authstatus: %s", 0, error.message );
@@ -284,7 +481,7 @@ public class Monitor : Object
         logger.log("PDP", "Network Status changed");
         if(status != null)
         {
-            log("PDP",0, "Status");
+            logger.log("PDP", "Status");
             status.for_each((HFunc) log_pdp_network_status );
         }
     }
@@ -334,12 +531,10 @@ public class Monitor : Object
     //
     private void cipher_status_changed(dynamic DBus.Object obj, string gsm, string gprs )
     {
-
         this.logger.log("NETWORK", "Cipher status changed. GSM: " + this.current_gsm_cipher + "->" + gsm + " GPRS: " + this.current_gprs_cipher + "->" + gprs );
     }
     private void network_incoming_ussd( dynamic DBus.Object obj, string mode, string message )
     {
-
         this.logger.log("NETWORK", "Incoming USSD. mode: " + mode + " message: " + message );
     }
 
@@ -415,6 +610,7 @@ public class Monitor : Object
     private void incoming_cb(dynamic DBus.Object obj, int serial, int channel,
             int encoding, int page, string data)
     {
+        logger.log("CB", "Received CB with serial " +  serial.to_string() + "on channel " + channel.to_string() +". Encoding " +encoding.to_string() + " Page: " + " Data: " + data);
         log("CB", 0,"Received CB with serial %i on channel %i. Encoding %i Page: %i Data: %s",
             serial,channel, encoding, page,data);
     }
@@ -424,8 +620,8 @@ public class Monitor : Object
     //
     public void accuracy_changed(DBus.Object obj)
     {
-        log("GPS", 0,"Accuracy changed");
+        logger.log("GPS", "Accuracy changed");
     }
-
+ }
 }
 

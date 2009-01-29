@@ -40,7 +40,6 @@ public class Logger : Object
             error("Can't open %s", this.log_path);
         }
 
-        log("INFO",  "logger restarted" );
     }
 	public void logDATA( string message )
 	{
