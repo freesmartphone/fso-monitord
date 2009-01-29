@@ -31,13 +31,13 @@ int main(string[] args)
 
     try
     {
-        var monitor = new Monitor();
+        var monitor = new Monitor( logger );
         monitor = monitor; // silence warning
         loop.run();
     } catch (Error e) {
         stderr.printf ("Oops: %s\n", e.message);
-		return 1;
+        return 1;
     }
-	return 0;
+    return 0;
 }
 
