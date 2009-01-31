@@ -127,12 +127,16 @@ public class Monitor : Object
 
     private HashTable<string,string> current_network_status;
 
+    public Monitor( Logger l )
+    {
+        this.logger = l;
+        logger.logINFO( "---------------Monitor restarted----------------" );
+    }
+
     construct
     {
         try
         {
-            logger = new Logger();
-            logger.logINFO( "---------------Monitor restarted----------------" );
             conn = DBus.Bus.get( DBus.BusType.SYSTEM );
 
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
@@ -252,7 +256,7 @@ public class Monitor : Object
     {
         if( error != null )
         {
-            debug("Can't get scenario " + error.message );
+            debug("Can't get scenario: %s" , error.message );
             this.current_scenario = "UNKNOWN";
         }
         else
@@ -282,7 +286,7 @@ public class Monitor : Object
     {
         if( error != null )
         {
-            debug("Can't get USB Power" + error.message );
+            debug("Can't get USB Power %s", error.message );
             //Let's say no to have a defined state
             this.current_power_usb = false;
         }
@@ -303,7 +307,7 @@ public class Monitor : Object
     {
         if( error != null )
         {
-            debug("Can't get Power" + error.message );
+            debug("Can't get Power %s", error.message );
             //Let's say no to have a defined state
             this.current_power_wifi = false;
         }
@@ -324,7 +328,7 @@ public class Monitor : Object
     {
         if( error != null )
         {
-            debug("Can't get Bluetooth Power" + error.message );
+            debug("Can't get Bluetooth Power %s", error.message );
             //Let's say no to have a defined state
             this.current_power_bt = false;
         }
@@ -347,7 +351,7 @@ public class Monitor : Object
     {
         if( error != null )
         {
-            debug( "Can't get power status: " + error.message );
+            debug( "Can't get power status: %s", error.message );
             this.current_power_status = "unknown";
         }
         else
@@ -364,7 +368,7 @@ public class Monitor : Object
     {
         if ( error != null )
         {
-            debug("Can't get capacity: " + error.message );
+            debug("Can't get capacity: %s", error.message );
             this.current_capacity = -1;
         }
         else
@@ -488,7 +492,6 @@ public class Monitor : Object
     private void log_pdp_network_status( string key, Value value)
     {
         string val = this.current_network_status.lookup( key );
-        string msg = null;
         string sval =  value.get_string() ;
 
         if( val == null )
