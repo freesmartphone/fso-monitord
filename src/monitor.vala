@@ -37,45 +37,6 @@ string[] stringListToArray( List<string>? theList )
     return res;
 }
 
-string value_to_string( Value value )
-{
-    string val = null;
-    if( value.holds( typeof( string ) ) )
-    {
-        val = value.get_string() ;
-    }
-    else if (value.holds( typeof( int ) ) )
-    {
-        val = value.get_int( ).to_string();
-    }
-    else if (value.holds( typeof( bool ) ) )
-    {
-        val = value.get_boolean().to_string();
-    }
-    else if( value.holds( typeof( uint ) ) )
-    {
-        val = value.get_uint().to_string();
-    }
-    else if( value.holds( typeof( double ) ) )
-    {
-        val = value.get_double().to_string();
-    }
-    else if( value.holds( typeof( float ) ) )
-    {
-        val = value.get_float().to_string();
-    }
-    else if( value.holds( typeof( char ) ) )
-    {
-        val = value.get_char().to_string();
-    }
-    else
-    {
-        val = "unknown type: " + value.type_name();
-    }
-
-    return val;
-}
-
 
 //===========================================================================
 public class Monitor : Object
@@ -109,16 +70,15 @@ public class Monitor : Object
     private dynamic DBus.Object odeviced_power_cntl_bt;
 
     
-    private string current_call_status;
     private string current_home_zone;
     private string current_auth_status;
     private string current_gsm_cipher;
     private string current_gprs_cipher;
     private string current_scenario;
     private string current_power_status;
+    private string current_capacity;
 
     private int current_signal_strength;
-    private int current_capacity;
 
 
     private bool current_power_bt;
@@ -130,7 +90,7 @@ public class Monitor : Object
     public Monitor( Logger l )
     {
         this.logger = l;
-        logger.logINFO( "---------------Monitor restarted----------------" );
+        this.logger.logINFO( "---------------Monitor restarted----------------" );
     }
 
     construct
@@ -244,12 +204,12 @@ public class Monitor : Object
     //
     private void sound_status_changed( dynamic DBus.Object obj, string id, string status, HashTable<string,Value?> properties )
     {
-        logger.log("DEVICE.AUDIO", "Status :" + id + ": " + status);
+        this.logger.log("DEVICE").signal("Status").name("ID").type(typeof(string)).value(id).name("status").type(typeof(string)).value(status);
         //ignoring properties: not yet defined
     }
     private void scenario_changed( dynamic DBus.Object obj, string scenario)
     {
-        logger.log("DEVICE.AUDIO", "Scenario changed: " + this.current_scenario + "->" + scenario);
+        this.logger.log("DEVICE").signal( "Scenario changed").name( "scenario").type(typeof(string)).from( this.current_scenario ).to(  scenario ).end();
         this.current_scenario = scenario;
     }
     private void get_scenario( dynamic DBus.Object obj, string s, GLib.Error error )
@@ -270,7 +230,10 @@ public class Monitor : Object
     //
     private void input_event( dynamic DBus.Object obj, string name, string action, int seconds)
     {
-        logger.log("DEVICE.INPUT", "Event: " + name + action + seconds.to_string());    
+        this.logger.log("DEVICE").signal( "Event" )
+            .name("name").type( typeof(string) ).value( name )
+            .name( "action" ).type( typeof(string) ).value( action )
+            .name("seconds").type(typeof(int)).value( seconds.to_string()).end();
     }
 
     //
@@ -278,7 +241,7 @@ public class Monitor : Object
     //
     private void power_changed_usb( dynamic DBus.Object obj, bool on)
     {
-        logger.log("DEVICE", "USB Power: " + this.current_power_usb.to_string() + "->" + on.to_string());    
+        this.logger.log("DEVICE").signal( "USBPower" ).name( "on" ).from( this.current_power_usb.to_string() ).to( on.to_string()).end();    
         this.current_power_usb = on;
     }
 
@@ -299,7 +262,7 @@ public class Monitor : Object
 
     private void power_changed_wifi( dynamic DBus.Object obj, bool on)
     {
-        logger.log("DEVICE", "WiFi Power: " + this.current_power_wifi.to_string() + "->" + on.to_string());    
+        this.logger.log("DEVICE").signal( "WiFiPower" ).name( "on").type(typeof(bool) ).from( this.current_power_wifi.to_string() ).to( on.to_string()).end();    
         this.current_power_wifi = on;
     }
 
@@ -320,7 +283,7 @@ public class Monitor : Object
 
     private void power_changed_bt( dynamic DBus.Object obj, bool on)
     {
-        logger.log("DEVICE", "Bluetooth Power: " + this.current_power_bt.to_string() + "->" + on.to_string());    
+        this.logger.log("DEVICE").signal( "Bluetooth Power" ).name( "on" ).type( typeof( bool ) ).from( this.current_power_bt.to_string() ).to( on.to_string()).end();    
         this.current_power_bt = on;
     }
 
@@ -344,7 +307,7 @@ public class Monitor : Object
     //
     private void power_status_changed( dynamic DBus.Object obj, string status)
     {
-        logger.log( "POWERSUPPLY", "PowerStatus changed" + this.current_power_status + "->" + status );
+        this.logger.log( "POWERSUPPLY" ).signal( "PowerStatus").name( "status" ).type(typeof(string) ).from( this.current_power_status).to( status ).end();
         this.current_power_status = status;
     }
     private void get_power_status( dynamic DBus.Object obj, string status, GLib.Error error)
@@ -359,17 +322,18 @@ public class Monitor : Object
             this.current_power_status = status;
         }
     }
-    private void capacity_changed( dynamic DBus.Object obj, int status )
+    private void capacity_changed( dynamic DBus.Object obj, string status )
     {
-        logger.log( "POWERSUPPLY", "Capacity changed: " + this.current_capacity.to_string() + "->" + status.to_string() );
+        this.logger.log( "POWERSUPPLY" ).name( "CapacityChanged" ).type(typeof(string)).from(this.current_capacity).to( status ).end();
         this.current_capacity = status;
     }
-    private void get_capacity( dynamic DBus.Object obj, int capacity, GLib.Error error )
+
+    private void get_capacity( dynamic DBus.Object obj, string capacity, GLib.Error error )
     {
         if ( error != null )
         {
             debug("Can't get capacity: %s", error.message );
-            this.current_capacity = -1;
+            this.current_capacity = "UNKNOWN";
         }
         else
         {
@@ -377,31 +341,26 @@ public class Monitor : Object
         }
     }
 
-
     //
     // org.freesmartphone.Usage
     //
     private void usage_resource_available( dynamic DBus.Object obj, string name, bool state)
     {
-        logger.log("USAGE", "Resource available: name:'" + name + "' state: " + state.to_string() );
+        this.logger.log("USAGE").signal( "ResourceAvailable" )
+            .name("name").type( typeof(string)).value( name )
+            .name( "state" ).type(typeof(bool)).value( state.to_string() ).end();
     }
     private void usage_resource_changed( dynamic DBus.Object obj, string name, bool state, HashTable<string, Value?> attr)
     {
-        logger.log("USAGE", "Ressource Changed: name: '" + name +"' state: " +state.to_string());
-        if(attr != null)
-        {
-            this.logger.log("USAGE", "Attributes:");
-            attr.for_each((HFunc) log_usage_resource_changed_attr);
-        }
-    }
-    private void log_usage_resource_changed_attr(string key, Value value)
-    {
-        this.logger.log( "USAGE", key + ": " + value_to_string(value) );
+        this.logger.log("USAGE").signal( "RessourceChanged:")
+            .name( "name").type(typeof(string)).value( name )
+            .name( "state").type( typeof(string)).value(state.to_string())
+            .name( "attributes" ).attributes( attr ).end();
     }
 
     private void usage_system_action(dynamic DBus.Object obj, string action)
     {
-        this.logger.log("USAGE", "System action: " + action);
+        this.logger.log("USAGE").signal( "SystemAction" ).name( "action" ).type( typeof( string ) ).value( action).end();
     }
 
     //
@@ -409,11 +368,11 @@ public class Monitor : Object
     //
     private void powersupply_status( dynamic DBus.Object obj, string status )
     {
-        logger.log("DEVICE", "Power Status: " + status );
+        this.logger.log("DEVICE").signal( "PowerStatus" ).name( "status" ).type(typeof(string)).value( status ).end();
     }
     private void powersupply_capacity( dynamic DBus.Object obj, int capacity )
     {
-        logger.log("DEVICE", "Power Capacity: " + capacity.to_string() );
+        this.logger.log("DEVICE").signal( "PowerCapacity" ).name( "capacity" ).type( typeof(int) ).value( capacity.to_string() ).end();
     }
 
     //
@@ -421,16 +380,10 @@ public class Monitor : Object
     //
     private void sms_incoming_message(dynamic DBus.Object obj, string sender, string content, HashTable<string,Value?> properties)
     {
-        this.logger.log("SMS", "Incoming message. sender:" + sender + "content: " + content );
-        if( properties != null)
-        {
-            this.logger.log("SMS", "Properties:");
-            properties.for_each((HFunc)log_sms_incoming_properties);
-        }
-    }
-    private void log_sms_incoming_properties( string key, Value value )
-    {
-        this.logger.log( "SMS", key + ": " + value_to_string(value) );
+        this.logger.log("SMS").signal( "IncomingMessage")
+            .name("sender").type( typeof(string) ).value( sender )
+            .name( "content" ).type( typeof(string) ).value( content )
+            .name( "properties" ).attributes( properties ).end();
     }
 
     //
@@ -438,7 +391,7 @@ public class Monitor : Object
     //
     private void sim_auth_status_changed(dynamic DBus.Object obj, string status)
     {
-        logger.log("SIM", "Auth status changed: " +  this.current_auth_status + "->" + status);
+        this.logger.log("SIM" ).signal( "AuthStatus").name("status").type(typeof(string)).from( this.current_auth_status ).to( status ).end();
         this.current_auth_status = status;
     }
     private void sim_get_auth_status( dynamic DBus.Object obj, string status, GLib.Error error)
@@ -450,12 +403,12 @@ public class Monitor : Object
         else
         {
             this.current_auth_status = status;
-            this.logger.log( "SIM", "New authstatus: " + status );
+            this.logger.log( "SIM" ).signal( "AuthStatus").name( "status" ).type( typeof(string) ).value( status ).end();
         }
     }
     private void sim_incoming_stored_message( dynamic DBus.Object obj, int idx)
     {
-        this.logger.log("SIM", "New stored message at " + idx.to_string() );
+        this.logger.log("SIM").signal("IncomingStoredMessage").name( "index" ).type( typeof(int) ).value( idx.to_string() ).end();
     }
 
     //
@@ -463,7 +416,10 @@ public class Monitor : Object
     //
     private void pdp_context_status_changed( dynamic DBus.Object obj, int id, string status, HashTable<string,Value?> properties)
     {
-        this.logger.log("PDP", "Context status changed. ID: "+ id.to_string() + " status: " +status );
+        this.logger.log("PDP").signal( "ContextStatus" )
+            .name( "ID" ).type( typeof(int) ).value( id.to_string() )
+            .name( "status" ).type( typeof(string) ).value( status )
+            .name( "properties").attributes( properties ).end();
     }
     private void get_network_status( dynamic DBus.Object obj, HashTable<string, Value?> status, GLib.Error error)
     {
@@ -482,29 +438,7 @@ public class Monitor : Object
     }
     private void pdp_network_status_changed( dynamic DBus.Object obj, HashTable<string, Value?> status )
     {
-        logger.log("PDP", "Network Status changed");
-        if(status != null)
-        {
-            logger.log("PDP", "Status");
-            status.for_each((HFunc) log_pdp_network_status );
-        }
-    }
-    private void log_pdp_network_status( string key, Value value)
-    {
-        string val = this.current_network_status.lookup( key );
-        string sval =  value.get_string() ;
-
-        if( val == null )
-        {
-            this.current_network_status.insert(key, sval );
-            this.logger.log("PDP", "New Status " + key + ": " + sval );
-        }
-        else if( val != value.get_string() )
-        {
-            this.current_network_status.replace(key, sval );
-            this.logger.log("PDP", "Status changed: " + key + " " + val + "->" + sval );
-        }
-        //How could we figure out if an element is gone?
+        this.logger.log("PDP").signal( "NetworkStatus").name("status").attributes( status );
     }
 
     //
@@ -518,14 +452,13 @@ public class Monitor : Object
         }
         else
         {
-            this.logger.log("HZ", "Current homezone: " + zone );
             this.current_home_zone = zone;
         }
     }
 
     private void home_zone_changed( dynamic GLib.Object obj, string zone)
     {
-        this.logger.log("HZ", "Homezone changed: " + this.current_home_zone + "->" + zone);
+        this.logger.log("HZ").signal( "HomeZoneStatus" ).name( "zone" ).type( typeof(string)).from(this.current_home_zone).to( zone).end();
         this.current_home_zone = zone;
     }
 
@@ -534,16 +467,22 @@ public class Monitor : Object
     //
     private void cipher_status_changed(dynamic DBus.Object obj, string gsm, string gprs )
     {
-        this.logger.log("NETWORK", "Cipher status changed. GSM: " + this.current_gsm_cipher + "->" + gsm + " GPRS: " + this.current_gprs_cipher + "->" + gprs );
+        this.logger.log("NETWORK").signal( "CipherStatus")
+            .name( "GSM" ).type(typeof(string)).from( this.current_gsm_cipher ).to( gsm )
+            .name("GPRS").type(typeof(string)).from( this.current_gprs_cipher ).to(gprs ).end();
+            this.current_gsm_cipher = gsm;
+            this.current_gprs_cipher = gprs;
     }
     private void network_incoming_ussd( dynamic DBus.Object obj, string mode, string message )
     {
-        this.logger.log("NETWORK", "Incoming USSD. mode: " + mode + " message: " + message );
+        this.logger.log("NETWORK").signal("IncomingUSSD")
+            .name( "mode" ).type( typeof(string)).value( mode )
+            .name( "message" ).type( typeof(string) ).value( message ).end();
     }
 
     private void network_signal_strength_changed(dynamic DBus.Object obj, int i )
     {
-        this.logger.log("NETWORK", "Signal strength changed: " + this.current_signal_strength.to_string() + "%%->" + i.to_string() );
+        this.logger.log("NETWORK").signal( "SignalStrength" ).name( "strength").type( typeof(int) ).from( this.current_signal_strength.to_string() ).to( i.to_string() ).end();
         this.current_signal_strength = i;
     }
 
@@ -552,6 +491,7 @@ public class Monitor : Object
         if( error != null)
         {
             log("NETWORK", 0, "Can't get signal strength: %s", error.message );
+            this.current_signal_strength = -1;
         }
         else
         {
@@ -561,19 +501,9 @@ public class Monitor : Object
 
     private void network_status_changed(dynamic DBus.Object obj, HashTable<string,Value?> properties)
     {
-        this.logger.log("NETWORK",  "GSM Network status changed");
-        if( properties != null)
-        {
-            logger.log("NETWORK", "Properties");
-            properties.for_each( (HFunc) this.log_nw_status_properties);
-        }
-
+        this.logger.log("NETWORK").signal( "NetworkStatus" ).name( "properties" ).attributes( properties ).end();
     }
 
-    private void log_nw_status_properties( string key, Value value)
-    {
-        logger.log("NETWORK", key + ": " + value_to_string(value) );
-    }
 
     //
     // org.freesmartphone.GSM.Call
@@ -581,49 +511,32 @@ public class Monitor : Object
     public void call_status_changed( dynamic DBus.Object obj, int id,
             string status, GLib.HashTable<string,Value?> properties)
     {
-        this.logger.log("CALL", "Status changed to: " + this.current_call_status + " -> " + status + " ID: " +id.to_string() );
-        if(properties != null)
-        {
-            this.logger.log("CALL", "Properties:" );
-            properties.for_each((HFunc)this.log_call_status_properties);
-        }
-        this.current_call_status = status;
+        this.logger.log("CALL").signal( "Status" )
+                .name( "ID" ).type( typeof( int) ).value( id.to_string() )
+                .name( "status").type ( typeof( string ) ).value( status )
+                .name( "properties" ).attributes( properties ).end();
     }
-    private void log_call_status_properties(string key, Value value)
-    {
-        //currently all parameters are strings
-        logger.log("CALL", key + ": " + value.get_string());
-    }
-    private void set_call_state( dynamic DBus.Object obj, int serial,
-            string status, GLib.HashTable<string,Value?> properties, GLib.Error error)
-    {
-        if( error != null)
-        {
-            log("CALL", 0, "Can't get current CallStatus %s", error.message);
-        }
-        else
-        {
-            this.current_call_status = status;
-        }
-    }
-
     //
     // org.freesmartphone.GSM.CB
     //
     private void incoming_cb(dynamic DBus.Object obj, int serial, int channel,
             int encoding, int page, string data)
     {
-        logger.log("CB", "Received CB with serial " +  serial.to_string() + "on channel " + channel.to_string() +". Encoding " +encoding.to_string() + " Page: " + " Data: " + data);
-        log("CB", 0,"Received CB with serial %i on channel %i. Encoding %i Page: %i Data: %s",
-            serial,channel, encoding, page,data);
+        this.logger.log("CB").signal("IncomingCellBroadcast" )
+                .name( "serial" ).type( typeof( int ).value( serial.to_string())
+                .name( "channel" ).type( typeof( int ) ).value( channel.to_string() )
+                .name( "encoding" ).type( int ).value( encoding.to_string )
+                .name( "page" ).type( typeof( int ) ).value( page.to_string )
+                .name( "data" ).type( typeof( string ) ).value( data ).end();
     }
 
     //
     // org.freedesktop.Gypsy.Accuracy
     //
-    public void accuracy_changed(DBus.Object obj)
+    public void accuracy_changed(DBus.Object obj, int fields, double pdop, double hdop, double vdop)
     {
-        logger.log("GPS", "Accuracy changed");
+        this.logger.log("GPS").signal( "AccuracyChanged" )
+                .name( "fields" ).type( typeof( int ) ).value( fields.to_string() )
     }
  }
 }
