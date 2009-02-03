@@ -24,19 +24,6 @@ using GLib;
 using CONST;
 
 
-//===========================================================================
-string[] stringListToArray( List<string>? theList )
-{
-    var res = new string[theList.length()];
-    int counter = 0;
-    foreach ( string el in theList )
-    {
-        res[counter] = el;
-        counter++;
-    }
-    return res;
-}
-
 
 //===========================================================================
 public class Monitor : Object
@@ -77,6 +64,7 @@ public class Monitor : Object
     private string current_scenario;
     private string current_power_status;
     private string current_capacity;
+    private string current_call_status;
 
     private int current_signal_strength;
 
@@ -516,6 +504,20 @@ public class Monitor : Object
                 .name( "status").type ( typeof( string ) ).value( status )
                 .name( "properties" ).attributes( properties ).end();
     }
+    private void set_call_state( dynamic DBus.Object obj, int serial,
+            string status, GLib.HashTable<string,Value?> properties, GLib.Error error)
+    {
+        if( error != null)
+        {
+            log("CALL", 0, "Can't get current CallStatus %s", error.message);
+            this.current_call_status = "UNKOWN";
+        }
+        else
+        {
+            this.current_call_status = status;
+        }
+    }
+
     //
     // org.freesmartphone.GSM.CB
     //
@@ -523,11 +525,11 @@ public class Monitor : Object
             int encoding, int page, string data)
     {
         this.logger.log("CB").signal("IncomingCellBroadcast" )
-                .name( "serial" ).type( typeof( int ).value( serial.to_string())
+                .name( "serial" ).type( typeof( int ) ).value( serial.to_string() )
                 .name( "channel" ).type( typeof( int ) ).value( channel.to_string() )
-                .name( "encoding" ).type( int ).value( encoding.to_string )
-                .name( "page" ).type( typeof( int ) ).value( page.to_string )
-                .name( "data" ).type( typeof( string ) ).value( data ).end();
+                .name( "encoding" ).type( typeof( int ) ).value( encoding.to_string() )
+                .name( "page" ).type( typeof( int ) ).value( page.to_string() )
+                .name( "data" ).type( typeof( string ) ).value( data ).end( );
     }
 
     //
@@ -537,7 +539,9 @@ public class Monitor : Object
     {
         this.logger.log("GPS").signal( "AccuracyChanged" )
                 .name( "fields" ).type( typeof( int ) ).value( fields.to_string() )
+                .name( "pdop" ).type( typeof( double ) ).value( pdop.to_string() )
+                .name( "pdop" ).type( typeof( double ) ).value( hdop.to_string() )
+                .name( "pdop" ).type( typeof( double ) ).value( vdop.to_string() ).end();
     }
- }
 }
 

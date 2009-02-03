@@ -61,6 +61,19 @@ string value_to_string( Value value )
 
     return val;
 }
+//===========================================================================
+string[] stringListToArray( List<string>? theList )
+{
+    var res = new string[theList.length()];
+    int counter = 0;
+    foreach ( string el in theList )
+    {
+        res[counter] = el;
+        counter++;
+    }
+    return res;
+}
+
 
 
 //===========================================================================
@@ -71,10 +84,15 @@ public class Logger : Object
     private string log_path;
     private string buf;
     private string cur_domain;
+    private int indent_level = 0;
+    private string indent_string = "    ";
 
-    private void log_hash_table( string k, Value v)
+    private void log_hash_table( void* key, void* value)
     {
-        stream.printf("\t\t%s:%s\n", k, value_to_string(v) );
+        string k = (string)key;
+        Value? v = (Value?) value;
+        stream.putc( '\n' );
+        this.name( k ).type( v.type() ).value( value_to_string(v));
     }
 
 
@@ -90,15 +108,14 @@ public class Logger : Object
         }
 
     }
-	public void logDATA( string message )
-	{
-		this.log("DATA").message(message);
-	}
-	public void logINFO( string message)
-	{
-		this.log("INFO").message(message);
-	}
-
+    public void logDATA( string message )
+    {
+            this.log("DATA").message(message);
+    }
+    public void logINFO( string message)
+    {
+            this.log("INFO").message(message);
+    }
 
     public unowned Logger log(string domain)
     {
@@ -111,7 +128,6 @@ public class Logger : Object
     {
         stream.puts(msg + " ");
         return this;
-
     }
     public unowned Logger signal(string name)
     {
@@ -145,7 +161,38 @@ public class Logger : Object
     }
     public unowned Logger attributes( HashTable<string,Value?> attr )
     {
-        attr.for_each((HFunc) log_hash_table);
+        attr.for_each( this.log_hash_table );
+        stream.putc( '\n' );
+        return this;
+    }
+    public unowned Logger begin_array()
+    {
+        stream.putc( '[' );
+        return this;
+    }
+    public unowned Logger end_array()
+    {
+        stream.putc( ']' );
+        return this;
+    }
+    public unowned Logger begin_list()
+    {
+        stream.putc( '{' );
+        return this;
+    }
+    public unowned Logger end_list()
+    {
+        stream.putc( '}' );
+        return this;
+    }
+    public unowned Logger begin_tuple()
+    {
+        stream.putc( '(' );
+        return this;
+    }
+    public unowned Logger end_tuple()
+    {
+        stream.putc( ')' );
         return this;
     }
     public void end()
