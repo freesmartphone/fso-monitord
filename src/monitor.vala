@@ -89,6 +89,8 @@ public class Monitor : Object
             framework = conn.get_object( FSO_FSO_BUS_NAME, FSO_FSO_OBJ_PATH, FSO_FSO_IFACE );
             debug( "Attached to frameworkd %s. Gathering objects...", framework.GetVersion() );
 
+            debug("Getting usage Object...");
+
             usage = conn.get_object( FSO_USAGE_BUS_NAME, FSO_USAGE_OBJ_PATH, FSO_USAGE_IFACE );
             usage.ResourceAvailable += this.usage_resource_available;
             usage.ResourceChanged += this.usage_resource_changed;
@@ -97,12 +99,14 @@ public class Monitor : Object
             ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
             ogsmd_device.ThisVersionNotThere();
 
+            debug("Getting SIM Object...");
             ogsmd_sim = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_SIM_IFACE );
             ogsmd_sim.AuthStatus += this.sim_auth_status_changed;
             ogsmd_sim.GetAuthStatus( this.sim_get_auth_status );
             ogsmd_sim.IncomingStoredMessage += this.sim_incoming_stored_message;
             ogsmd_sim.Ping();
 
+            debug("Getting network Object...");
             ogsmd_network = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_NET_IFACE );
             ogsmd_network.Status += this.network_status_changed;
             ogsmd_network.SignalStrength += this.network_signal_strength_changed;
@@ -111,57 +115,68 @@ public class Monitor : Object
             ogsmd_network.CipherStatus += this.cipher_status_changed;
             ogsmd_network.Ping();
 
+            debug("Getting call Object...");
             ogsmd_call = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_CALL_IFACE );
             ogsmd_call.CallStatus += this.call_status_changed;
             ogsmd_call.ListCalls(this.set_call_state);
             ogsmd_call.Ping();
 
+            debug("Getting pdp Object...");
             ogsmd_pdp = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_PDP_IFACE );
             ogsmd_pdp.NetworkStatus += this.pdp_network_status_changed;
             ogsmd_pdp.GetNetworkStatus (this.get_network_status);
             ogsmd_pdp.ContextStatus += this.pdp_context_status_changed;
             ogsmd_pdp.Ping();
 
+            debug("Getting cb Object...");
             ogsmd_cb = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_CB_IFACE );
             ogsmd_cb.IncomingCellBroadcast += this.incoming_cb;
             ogsmd_cb.Ping();
 
+            debug("Getting sms Object...");
             ogsmd_sms = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_SMS_IFACE );
             ogsmd_sms.IncomingMessage += this.sms_incoming_message;
             ogsmd_sms.Ping();
 
+            debug("Getting usage Object...");
             odeviced_audio = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_AUDIO_OBJ_PATH, FSO_DEV_AUDIO_IFACE );
             odeviced_audio.SoundStatus += this.sound_status_changed;
             odeviced_audio.Scenario += this.scenario_changed;
             odeviced_audio.GetScenario ( this.get_scenario );
             odeviced_audio.Ping();
 
+            debug("Getting input Object...");
             odeviced_input = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_INPUT_OBJ_PATH, FSO_DEV_INPUT_IFACE );
             odeviced_input.Event += this.input_event;
             odeviced_input.Ping();
 
+            debug("Getting PowerControl.USB Object...");
             odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_USB_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
             odeviced_power_cntl_usb.GetPower( this.get_power_usb );
             odeviced_power_cntl_usb.Power += this.power_changed_usb;
             odeviced_power_cntl_usb.Ping();
 
-            odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_WIFI_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
+            debug("Getting PowerControl.Wifi Object...");
+            odeviced_power_cntl_wifi = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_WIFI_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
             odeviced_power_cntl_wifi.GetPower( this.get_power_wifi );
             odeviced_power_cntl_wifi.Power += this.power_changed_wifi;
             odeviced_power_cntl_wifi.Ping();
 
-            odeviced_power_cntl_usb = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_BT_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
+            debug("Getting PowerControl.BT Object...");
+            odeviced_power_cntl_bt = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_PC_BT_OBJ_PATH, FSO_DEV_POWER_CONTROL_IFACE );
             odeviced_power_cntl_bt.GetPower( this.get_power_bt );
             odeviced_power_cntl_bt.Power += this.power_changed_bt;
-            odeviced_power_cntl_wifi.Ping();
+            odeviced_power_cntl_bt.Ping();
 
-
+            debug("Getting PowerSupply Object...");
             odeviced_power_supply = conn.get_object (FSO_DEV_BUS_NAME, FSO_DEV_POWER_SUPPLY_OBJ_PATH, FSO_DEV_POWER_SUPPLY_IFACE );
             odeviced_power_supply.PowerStatus += this.power_status_changed;
             odeviced_power_supply.GetPowerStatus( this.get_power_status );
             odeviced_power_supply.Capacity += this.capacity_changed;
             odeviced_power_supply.GetCapacity( this.get_capacity );
             odeviced_power_supply.Ping();
+
+            debug("Getting HZ Object...");
             // HZ is exported by org/freesmartphone/GSM/Server
             ogsmd_hz = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_PHONE_OBJ_PATH, FSO_GSM_HZ_IFACE );
             ogsmd_hz.HomeZoneStatus += this.home_zone_changed;
