@@ -96,7 +96,7 @@ public class Monitor : Object
             usage.SystemAction += this.usage_system_action;
 
             powersupply = conn.get_object( FSO_DEV_BUS_NAME, FSO_DEV_POWER_SUPPLY_OBJ_PATH, FSO_DEV_POWER_SUPPLY_IFACE );
-            powersupply.Status += this.powersupply_status;
+            powersupply.PowerStatus += this.powersupply_status;
             powersupply.Capacity += this.powersupply_capacity;
 
             ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );

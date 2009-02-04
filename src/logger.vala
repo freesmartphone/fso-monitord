@@ -82,19 +82,24 @@ public class Logger : Object
     /* private */
     private FileStream stream;
     private string log_path;
-    private string buf;
     private string cur_domain;
     private int indent_level = 0;
-    private string indent_string = "    ";
+    private string indent_string = "  ";
 
     private void log_hash_table( void* key, void* value)
     {
         string k = (string)key;
         Value? v = (Value?) value;
         stream.putc( '\n' );
+        this.log_indent();
         this.name( k ).type( v.type() ).value( value_to_string(v));
     }
+    private void log_indent()
+    {
+        for( int i = 0; i <this.indent_level; i++)
+            stream.puts( this.indent_string );
 
+    }
 
     /* public */
 
@@ -126,12 +131,13 @@ public class Logger : Object
     }
     public unowned Logger message(string msg)
     {
-        stream.puts(msg + " ");
+        stream.puts(msg + "\n");
         return this;
     }
     public unowned Logger signal(string name)
     {
         stream.puts( "::" + name + " ");
+        this.indent_level ++;
         return this;
     }
     //currently ignored. might be interesting for machine readable code
@@ -141,7 +147,8 @@ public class Logger : Object
     }
     public unowned Logger name(string name)
     {
-        stream.puts( name +  " " );
+        this.log_indent();
+        stream.puts( "\n" + name +  " " );
         return this;
     }
     public unowned Logger value(string name)
@@ -161,45 +168,62 @@ public class Logger : Object
     }
     public unowned Logger attributes( HashTable<string,Value?> attr )
     {
+        stream.puts( "={" );
+        this.indent_level ++;
         attr.for_each( this.log_hash_table );
         stream.putc( '\n' );
+        this.indent_level --;
+        this.log_indent();
+        stream.puts( "}\n" );
         return this;
     }
     public unowned Logger begin_array()
     {
-        stream.putc( '[' );
+        stream.puts( "=[" );
         return this;
     }
     public unowned Logger end_array()
     {
-        stream.putc( ']' );
+        stream.putc( '\n' );
+        this.indent_level--;
+        this.log_indent();
+        stream.puts( "]\n" );
         return this;
     }
     public unowned Logger begin_list()
     {
-        stream.putc( '{' );
+        stream.puts( "={" );
+        this.indent_level ++;
         return this;
     }
     public unowned Logger end_list()
     {
-        stream.putc( '}' );
+        stream.putc( '\n' );
+        this.indent_level--;
+        this.log_indent();
+        stream.puts( "}\n" );
         return this;
     }
     public unowned Logger begin_tuple()
     {
-        stream.putc( '(' );
+        this.log_indent();
+        stream.puts( "(\n" );
+        this.indent_level ++;
         return this;
     }
     public unowned Logger end_tuple()
     {
-        stream.putc( ')' );
+        stream.putc( '\n' );
+        this.indent_level --;
+        this.log_indent();
+        stream.puts( ")\n" );
         return this;
     }
     public void end()
     {
+        stream.putc( '\n' );
         stream.flush();
-        this.buf = "";
+        this.indent_level = 0;
     }
-
 }
 
