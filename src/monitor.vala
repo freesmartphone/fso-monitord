@@ -34,7 +34,6 @@ public class Monitor : Object
 
     private dynamic DBus.Object framework;
     private dynamic DBus.Object usage;
-    private dynamic DBus.Object powersupply;
 
     private dynamic DBus.Object ogsmd_device;
     private dynamic DBus.Object ogsmd_sim;
@@ -94,10 +93,6 @@ public class Monitor : Object
             usage.ResourceAvailable += this.usage_resource_available;
             usage.ResourceChanged += this.usage_resource_changed;
             usage.SystemAction += this.usage_system_action;
-
-            powersupply = conn.get_object( FSO_DEV_BUS_NAME, FSO_DEV_POWER_SUPPLY_OBJ_PATH, FSO_DEV_POWER_SUPPLY_IFACE );
-            powersupply.PowerStatus += this.powersupply_status;
-            powersupply.Capacity += this.powersupply_capacity;
 
             ogsmd_device = conn.get_object( FSO_GSM_BUS_NAME, FSO_GSM_OBJ_PATH, FSO_GSM_DEV_IFACE );
             ogsmd_device.ThisVersionNotThere();
@@ -349,18 +344,6 @@ public class Monitor : Object
     private void usage_system_action(dynamic DBus.Object obj, string action)
     {
         this.logger.log("USAGE").signal( "SystemAction" ).name( "action" ).type( typeof( string ) ).value( action).end();
-    }
-
-    //
-    // org.freesmartphone.Device
-    //
-    private void powersupply_status( dynamic DBus.Object obj, string status )
-    {
-        this.logger.log("DEVICE").signal( "PowerStatus" ).name( "status" ).type(typeof(string)).value( status ).end();
-    }
-    private void powersupply_capacity( dynamic DBus.Object obj, int capacity )
-    {
-        this.logger.log("DEVICE").signal( "PowerCapacity" ).name( "capacity" ).type( typeof(int) ).value( capacity.to_string() ).end();
     }
 
     //
