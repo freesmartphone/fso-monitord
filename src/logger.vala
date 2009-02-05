@@ -127,6 +127,7 @@ public class Logger : Object
         var tv = TimeVal();
         string time = tv.to_iso8601();
         stream.printf("%s:%s", time, domain);
+        this.cur_domain = domain;
         return this;
     }
     public unowned Logger message(string msg)
@@ -147,8 +148,9 @@ public class Logger : Object
     }
     public unowned Logger name(string name)
     {
+        stream.putc( '\n' );  
         this.log_indent();
-        stream.puts( "\n" + name +  " " );
+        stream.puts(name +  " " );
         return this;
     }
     public unowned Logger value(string name)
