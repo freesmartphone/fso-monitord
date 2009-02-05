@@ -202,7 +202,7 @@ public class Monitor : Object
     //
     private void sound_status_changed( dynamic DBus.Object obj, string id, string status, HashTable<string,Value?> properties )
     {
-        this.logger.log("DEVICE").signal("Status").name("ID").type(typeof(string)).value(id).name("status").type(typeof(string)).value(status);
+        this.logger.log("DEVICE").signal("Status").name("ID").type(typeof(string)).value(id).name("status").type(typeof(string)).value(status).end();
         //ignoring properties: not yet defined
     }
     private void scenario_changed( dynamic DBus.Object obj, string scenario)
@@ -424,7 +424,7 @@ public class Monitor : Object
     }
     private void pdp_network_status_changed( dynamic DBus.Object obj, HashTable<string, Value?> status )
     {
-        this.logger.log("PDP").signal( "NetworkStatus").name("status").attributes( status );
+        this.logger.log("PDP").signal( "NetworkStatus").name("status").attributes( status ).end();
     }
 
     //

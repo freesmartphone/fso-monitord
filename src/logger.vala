@@ -137,7 +137,7 @@ public class Logger : Object
     }
     public unowned Logger signal(string name)
     {
-        stream.puts( "::" + name + " ");
+        stream.puts( "::" + name );
         this.indent_level ++;
         return this;
     }
@@ -158,14 +158,14 @@ public class Logger : Object
         stream.puts( "=" + name + " " );
         return this;
     }
-    public unowned Logger from(string name)
+    public unowned Logger from(string value)
     {
-        stream.puts( name + " " );
+        stream.puts( value + " " );
         return this;
     }
-    public unowned Logger to(string name)
+    public unowned Logger to(string value)
     {
-        stream.puts( "->" + name + " ");
+        stream.puts( "->" + value + " ");
         return this;
     }
     public unowned Logger attributes( HashTable<string,Value?> attr )
@@ -176,7 +176,7 @@ public class Logger : Object
         stream.putc( '\n' );
         this.indent_level --;
         this.log_indent();
-        stream.puts( "}\n" );
+        stream.putc( '}' );
         return this;
     }
     public unowned Logger begin_array()
@@ -189,7 +189,7 @@ public class Logger : Object
         stream.putc( '\n' );
         this.indent_level--;
         this.log_indent();
-        stream.puts( "]\n" );
+        stream.putc( ']' );
         return this;
     }
     public unowned Logger begin_list()
@@ -203,13 +203,13 @@ public class Logger : Object
         stream.putc( '\n' );
         this.indent_level--;
         this.log_indent();
-        stream.puts( "}\n" );
+        stream.putc( '}' );
         return this;
     }
     public unowned Logger begin_tuple()
     {
         this.log_indent();
-        stream.puts( "(\n" );
+        stream.puts( "=(" );
         this.indent_level ++;
         return this;
     }
@@ -218,7 +218,7 @@ public class Logger : Object
         stream.putc( '\n' );
         this.indent_level --;
         this.log_indent();
-        stream.puts( ")\n" );
+        stream.putc( ')' );
         return this;
     }
     public void end()
