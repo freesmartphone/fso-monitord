@@ -47,6 +47,7 @@ namespace FSO
             {
                 debug( "Retrieving Info for services/profiles: %s", e.message );
             }
+            debug( "Prefernces started" );
         }
         private void get_services( dynamic DBus.Object obj, string[] services, GLib.Error error )
         {

@@ -77,6 +77,7 @@ namespace FSO
                 {
                     debug("PowerControl for %s:%s", this.name, e.message );
                 }
+                debug( "Started Device.PowerControl for %s", this.name );
             }
             public override void stop()
             {
@@ -124,7 +125,6 @@ namespace FSO
             }
             public override void run()
             {
-                debug("Getting PowerSupply Object for %s...", this.name);
                 base.run();
                 this.object.Capacity += this.capacity_changed;
                 this.object.PowerStatus += this.power_status_changed;
@@ -137,6 +137,7 @@ namespace FSO
                 {
                     debug("PowerSupply for %s: %s", this.name, e.message );
                 }
+                debug( "Started Device.PowerSupply for %s", this.name );
             }
             public override void stop()
             {
@@ -198,6 +199,7 @@ namespace FSO
                 base.run();
                 debug("Getting input Object...");
                 this.object.Event += this.input_event;
+                debug( "Started Device.Input" );
             }
             public override void stop()
             {
@@ -240,6 +242,7 @@ namespace FSO
                 {
                     debug("Can't get Scenario: %s", e.message );
                 }
+                debug( "Started Device.Audio" );
             }
             public override void stop()
             {

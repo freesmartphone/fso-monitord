@@ -59,6 +59,8 @@ namespace FSO
                 this._IFACE = IFACE;
                 this._BUS_NAME = BUS_NAME;
                 this._OBJ_PATH = name;
+                this.run(  );
+                debug( "New call on: %s", name );
             }
             public override void run( )
             {

@@ -68,7 +68,6 @@ namespace FSO
                 .name( "state").type( typeof(string)).value(state.to_string())
                 .name( "attributes" ).attributes( attr ).end();
         }
-
         private void system_action(dynamic DBus.Object obj, string action)
         {
             this.logger.log("USAGE").signal( "SystemAction" ).name( "action" ).type( typeof( string ) ).value( action).end();

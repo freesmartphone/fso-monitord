@@ -31,6 +31,15 @@ namespace FSO
         public GSM( Logger l, DBus.Connection c)
         {
             base(l,c);
+            this.subsystems.prepend( new Call( l,c ) );
+            this.subsystems.prepend( new CellBroadcast( l,c ) );
+            this.subsystems.prepend( new HomeZone( l,c ) );
+            this.subsystems.prepend( new MUX( l,c ) );
+            this.subsystems.prepend( new Network( l,c ) );
+            this.subsystems.prepend( new PDP( l,c ) );
+            this.subsystems.prepend( new Phone( l,c ) );
+            this.subsystems.prepend( new SIM( l,c ) );
+            this.subsystems.prepend( new SMS( l,c ) );
         }
         public class Call:Subsystem
         {
@@ -49,6 +58,7 @@ namespace FSO
             {
                 base.run();
                 this.object.CallStatus += this.call_status_changed;
+                debug( "Started GSM.Call" );
             }
             public override void stop()
             {
@@ -78,6 +88,7 @@ namespace FSO
             {
                 base.run();
                 this.object.IncomingCellBroadcast += this.incoming_cb;
+                debug( "Started GSM.CB" );
             }
             public override void stop()
             {
@@ -119,6 +130,7 @@ namespace FSO
                 {
                     debug( "GetHomeZone: %s:", e.message );
                 }
+                debug( "Started GSM.HZ" );
             }
             public override void stop()
             {
@@ -158,6 +170,7 @@ namespace FSO
             {
                 base.run();
                 this.object.Status += this.status_changed;
+                debug( "Started GSM.MUX" );
             }
             public override void stop()
             {
@@ -199,6 +212,7 @@ namespace FSO
                 {
                     debug( "GetSignalStatus: %s", e.message );
                 }
+                debug( "Started GSM.Network" );
             }
             public override void stop()
             {
@@ -273,6 +287,7 @@ namespace FSO
                 {
                     debug( "GetNetworkStatus: %s",e.message );
                 }
+                debug( "Started GSM.PDP" );
 
             }
             public override void stop()
@@ -323,6 +338,7 @@ namespace FSO
             {
                 base.run();
                 this.object.ServiceStatus += this.status_changed;
+                debug( "Started GSM.Phone" );
             }
             public override void stop()
             {
@@ -363,6 +379,7 @@ namespace FSO
                 {
                     debug( "GetAuthStatus: %s" , e.message );
                 }
+                debug( "Started Phone.SIM" );
             }
             public override void stop()
             {
@@ -410,6 +427,7 @@ namespace FSO
             {
                 base.run();
                 this.object.IncomingMessage += this.sms_incoming_message;
+                debug( "Started Phone.SMS" );
 
             }
             public override void stop()
