@@ -17,9 +17,13 @@ sbin_PROGRAMS = fso-monitord
 
 fso_monitord_VALASOURCES = \
 	src/logger.vala \
+	src/gsm.vala \
+	src/phone.vala \
+	src/preferences.vala \
+	src/device.vala \
+	src/usage.vala \
+	src/fso.vala \
 	src/monitor.vala \
-	src/main.vala \
-	src/consts.vala \
 	$(NULL)
 
 fso_monitord_SOURCES = \
@@ -28,7 +32,7 @@ fso_monitord_SOURCES = \
 	$(NULL)
 
 src/.vala.stamp: $(fso_monitord_VALASOURCES)
-	$(VALAC) -c --pkg dbus-glib-1 --save-temps --basedir $(top_srcdir) $^
+	$(VALAC) -c --pkg dbus-glib-1 --save-temps --basedir=$(top_srcdir) $^
 	touch $@
 
 fso_monitord_LDADD = \

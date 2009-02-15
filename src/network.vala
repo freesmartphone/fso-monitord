@@ -1,7 +1,9 @@
 /*
- * main.vala
+ * File Name: network.vala
+ * Creation Date: 06-02-2009
+ * Last Modified: 06-02-2009
  *
- * Authored by Michael 'Mickey' Lauer <mlauer@vanille-media.de>
+ * Authored by Frederik 'playya' Sdun <Frederik.Sdun@googlemail.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,26 +20,3 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
-
-//===========================================================================
-using GLib;
-using CONST;
-
-//===========================================================================
-int main(string[] args)
-{
-    var logger = new Logger();
-    var loop = new MainLoop(null, false);
-
-    try
-    {
-        var monitor = new Monitor( logger );
-        monitor = monitor; // silence warning
-        loop.run();
-    } catch (Error e) {
-        stderr.printf ("Oops: %s\n", e.message);
-        return 1;
-    }
-    return 0;
-}
-

@@ -21,7 +21,6 @@
 
 //===========================================================================
 using GLib;
-using CONST;
 
 string value_to_string( Value value )
 {
@@ -62,170 +61,160 @@ string value_to_string( Value value )
     return val;
 }
 //===========================================================================
-string[] stringListToArray( List<string>? theList )
-{
-    var res = new string[theList.length()];
-    int counter = 0;
-    foreach ( string el in theList )
-    {
-        res[counter] = el;
-        counter++;
-    }
-    return res;
-}
 
 
 
 //===========================================================================
-public class Logger : Object
+namespace FSO
 {
-    /* private */
-    private FileStream stream;
-    private string log_path;
-    private string cur_domain;
-    private int indent_level = 0;
-    private string indent_string = "  ";
-
-    private void log_hash_table( void* key, void* value)
+    public class Logger : Object
     {
-        string k = (string)key;
-        Value? v = (Value?) value;
-        stream.putc( '\n' );
-        this.log_indent();
-        this.name( k ).type( v.type() ).value( value_to_string(v));
-    }
-    private void log_indent()
-    {
-        for( int i = 0; i <this.indent_level; i++)
-            stream.puts( this.indent_string );
+        /* private */
+        private FileStream stream;
+        private string log_path;
+        private string cur_domain;
+        private int indent_level = 0;
+        private string indent_string = "  ";
 
-    }
-
-    /* public */
-
-    public Logger(string logfile = "/tmp/fso-monitor.log" )
-    {
-        this.log_path = logfile;
-            this.stream = FileStream.open( this.log_path, "a+" );
-        if( this.stream == null)
+        private void log_hash_table( void* key, void* value)
         {
-            error("Can't open %s", this.log_path);
+            string k = (string)key;
+            Value? v = (Value?) value;
+            this.log_indent();
+            this.name( k ).type( v.type() ).value( value_to_string(v) );
+        }
+        private void log_indent()
+        {
+            for( int i = 0; i <this.indent_level; i++)
+                stream.puts( this.indent_string );
+
         }
 
-    }
-    public void logDATA( string message )
-    {
-            this.log("DATA").message(message);
-    }
-    public void logINFO( string message)
-    {
-            this.log("INFO").message(message);
-    }
+        /* public */
 
-    public unowned Logger log(string domain)
-    {
-        var tv = TimeVal();
-        string time = tv.to_iso8601();
-        stream.printf("%s:%s", time, domain);
-        this.cur_domain = domain;
-        return this;
-    }
-    public unowned Logger message(string msg)
-    {
-        stream.puts(msg + "\n");
-        return this;
-    }
-    public unowned Logger signal(string name)
-    {
-        stream.puts( "::" + name );
-        this.indent_level ++;
-        return this;
-    }
-    //currently ignored. might be interesting for machine readable code
-    public unowned Logger type( Type t)
-    {
-        return this;
-    }
-    public unowned Logger name(string name)
-    {
-        stream.putc( '\n' );  
-        this.log_indent();
-        stream.puts(name +  " " );
-        return this;
-    }
-    public unowned Logger value(string name)
-    {
-        stream.puts( "=" + name + " " );
-        return this;
-    }
-    public unowned Logger from(string value)
-    {
-        stream.puts( value + " " );
-        return this;
-    }
-    public unowned Logger to(string value)
-    {
-        stream.puts( "->" + value + " ");
-        return this;
-    }
-    public unowned Logger attributes( HashTable<string,Value?> attr )
-    {
-        stream.puts( "={" );
-        this.indent_level ++;
-        attr.for_each( this.log_hash_table );
-        stream.putc( '\n' );
-        this.indent_level --;
-        this.log_indent();
-        stream.putc( '}' );
-        return this;
-    }
-    public unowned Logger begin_array()
-    {
-        stream.puts( "=[" );
-        return this;
-    }
-    public unowned Logger end_array()
-    {
-        stream.putc( '\n' );
-        this.indent_level--;
-        this.log_indent();
-        stream.putc( ']' );
-        return this;
-    }
-    public unowned Logger begin_list()
-    {
-        stream.puts( "={" );
-        this.indent_level ++;
-        return this;
-    }
-    public unowned Logger end_list()
-    {
-        stream.putc( '\n' );
-        this.indent_level--;
-        this.log_indent();
-        stream.putc( '}' );
-        return this;
-    }
-    public unowned Logger begin_tuple()
-    {
-        this.log_indent();
-        stream.puts( "=(" );
-        this.indent_level ++;
-        return this;
-    }
-    public unowned Logger end_tuple()
-    {
-        stream.putc( '\n' );
-        this.indent_level --;
-        this.log_indent();
-        stream.putc( ')' );
-        return this;
-    }
-    public void end()
-    {
-        stream.putc( '\n' );
-        stream.flush();
-        this.indent_level = 0;
+        public Logger(string logfile = "/tmp/fso-monitor.log" )
+        {
+            this.log_path = logfile;
+                this.stream = FileStream.open( this.log_path, "a+" );
+            if( this.stream == null)
+            {
+                error("Can't open %s", this.log_path);
+            }
+
+        }
+        public void logDATA( string message )
+        {
+                this.log("DATA").message(message);
+        }
+        public void logINFO( string message)
+        {
+                this.log("INFO").message(message);
+        }
+
+        public unowned Logger log(string domain)
+        {
+            var tv = TimeVal();
+            string time = tv.to_iso8601();
+            stream.printf("%s:%s", time, domain);
+            this.cur_domain = domain;
+            return this;
+        }
+        public unowned Logger message(string msg)
+        {
+            stream.puts(msg + "\n");
+            return this;
+        }
+        public unowned Logger signal(string name)
+        {
+            stream.puts( "::" + name );
+            this.indent_level ++;
+            return this;
+        }
+        //currently ignored. might be interesting for machine readable code
+        public unowned Logger type( Type t)
+        {
+            return this;
+        }
+        public unowned Logger name(string name)
+        {
+            stream.putc( '\n' );  
+            this.log_indent();
+            stream.puts(name +  " " );
+            return this;
+        }
+        public unowned Logger value(string name)
+        {
+            stream.puts( "=" + name + " " );
+            return this;
+        }
+        public unowned Logger from(string value)
+        {
+            stream.puts( value + " " );
+            return this;
+        }
+        public unowned Logger to(string value)
+        {
+            stream.puts( "->" + value + " ");
+            return this;
+        }
+        public unowned Logger attributes( HashTable<string,Value?> attr )
+        {
+            stream.puts( "={" );
+            this.indent_level ++;
+            attr.for_each( this.log_hash_table );
+            stream.putc( '\n' );
+            this.indent_level --;
+            this.log_indent();
+            stream.putc( '}' );
+            return this;
+        }
+        public unowned Logger begin_array()
+        {
+            stream.puts( "=[" );
+            return this;
+        }
+        public unowned Logger end_array()
+        {
+            stream.putc( '\n' );
+            this.indent_level--;
+            this.log_indent();
+            stream.putc( ']' );
+            return this;
+        }
+        public unowned Logger begin_list()
+        {
+            stream.puts( "={" );
+            this.indent_level ++;
+            return this;
+        }
+        public unowned Logger end_list()
+        {
+            stream.putc( '\n' );
+            this.indent_level--;
+            this.log_indent();
+            stream.putc( '}' );
+            return this;
+        }
+        public unowned Logger begin_tuple()
+        {
+            this.log_indent();
+            stream.puts( "=(" );
+            this.indent_level ++;
+            return this;
+        }
+        public unowned Logger end_tuple()
+        {
+            stream.putc( '\n' );
+            this.indent_level --;
+            this.log_indent();
+            stream.putc( ')' );
+            return this;
+        }
+        public void end()
+        {
+            stream.putc( '\n' );
+            stream.flush();
+            this.indent_level = 0;
+        }
     }
 }
-
