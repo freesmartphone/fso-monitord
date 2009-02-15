@@ -354,6 +354,7 @@ namespace FSO
                 base.run();
                 this.object.AuthStatus += auth_status_changed;
                 this.object.IncomingStoredMessage += incoming_stored_message;
+                this.object.ReadyStatus += this.ready_status;
                 try
                 {
                     this.object.GetAuthStatus ( get_auth_status );
@@ -388,6 +389,10 @@ namespace FSO
             private void incoming_stored_message( dynamic DBus.Object obj, int idx)
             {
                 this.logger.log("SIM").signal("IncomingStoredMessage").name( "index" ).type( typeof(int) ).value( idx.to_string() ).end();
+            }
+            private void ready_status ( dynamic DBus.Object obj, string status )
+            {
+                this.logger.log( "GSM.SIM" ).signal( "ReadyStatus" ).name( "status" ).type( typeof( string ) ).value( status ).end( );
             }
         }
         public class SMS: Subsystem
