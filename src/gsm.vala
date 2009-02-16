@@ -407,9 +407,9 @@ namespace FSO
             {
                 this.logger.log("SIM").signal("IncomingStoredMessage").name( "index" ).type( typeof(int) ).value( idx.to_string() ).end();
             }
-            private void ready_status ( dynamic DBus.Object obj, string status )
+            private void ready_status ( dynamic DBus.Object obj, bool status )
             {
-                this.logger.log( "GSM.SIM" ).signal( "ReadyStatus" ).name( "status" ).type( typeof( string ) ).value( status ).end( );
+                this.logger.log( "GSM.SIM" ).signal( "ReadyStatus" ).name( "status" ).type( typeof( string ) ).value( status.to_string(  ) ).end( );
             }
         }
         public class SMS: Subsystem
