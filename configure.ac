@@ -1,4 +1,4 @@
-AC_INIT([fso-monitord], [0.1.0], [mlauer@vanille-media.de], [fso-monitord])
+AC_INIT([fso-monitord], [0.2.0], [mlauer@vanille-media.de], [fso-monitord])
 AC_CONFIG_SRCDIR([Makefile.am])
 AC_CONFIG_HEADERS(config.h)
 AM_INIT_AUTOMAKE([dist-bzip2])
@@ -22,7 +22,7 @@ DBUS_REQUIRED=0.76
 PKG_CHECK_MODULES(DEPS,
   glib-2.0 >= $GLIB_REQUIRED
   gobject-2.0 >= $GLIB_REQUIRED
-  dbus-glib-1 >= $DBUS_REQUIRED
+  dbus-glib-1 >= $DBUS_REQUIRED)
 AC_SUBST(DEPS_CFLAGS)
 AC_SUBST(DEPS_LIBS)
 
