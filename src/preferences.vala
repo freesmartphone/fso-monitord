@@ -38,6 +38,7 @@ namespace FSO
         }
         public override void run(  )
         {
+            debug( "Gathering preferences ..." );
             this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
             try
             {
@@ -47,7 +48,6 @@ namespace FSO
             {
                 debug( "Retrieving Info for services/profiles: %s", e.message );
             }
-            debug( "Prefernces started" );
         }
         private void get_services( dynamic DBus.Object obj, string[] services, GLib.Error error )
         {
@@ -89,14 +89,15 @@ namespace FSO
             public static string IFACE = "org.freesmartphone.Preferences.Service";
             public Service( Logger l, DBus.Connection c, string name )
             {
+
                 base( l,c,name );
                 this._OBJ_PATH = "%s/%s".printf( OBJ_PATH, name );
                 this._BUS_NAME = BUS_NAME;
                 this._IFACE = IFACE;
-                debug( "New Service on %s", this._OBJ_PATH );
             }
             public override void run(  )
             {
+                debug( "Gathering Service object for %s", this.name );
                 base.run(  );
                 this.object.Notify += this.service_notify;
             }

@@ -36,6 +36,7 @@ namespace FSO
         }
         public override void run( )
         {
+            debug( "Gathering Phone object..." );
             this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
             this.object.Incoming += this.incoming_call;
         }
@@ -55,12 +56,12 @@ namespace FSO
 
             public Call( Logger l, DBus.Connection c, string name )
             {
+                debug( "New call on: %s", name );
                 base( l,c,name );
                 this._IFACE = IFACE;
                 this._BUS_NAME = BUS_NAME;
                 this._OBJ_PATH = name;
                 this.run(  );
-                debug( "New call on: %s", name );
             }
             public override void run( )
             {

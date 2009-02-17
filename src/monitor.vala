@@ -82,7 +82,8 @@ namespace FSO
         
         public virtual void run()
         {
-            this.object = this.con.get_object( this._BUS_NAME, _OBJ_PATH, _IFACE );
+            debug( "Gathering Object: BUS:%s OBJ_PATH:%s IFACE:%s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
+            this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             try
             {
                 debug( "Registered to FSO version: %s", this.object.GetVersion(  ) );

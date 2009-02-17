@@ -34,8 +34,8 @@ namespace FSO
         public Device( FSO.Logger l, DBus.Connection c)
         {
             base(l,c);
-            this.pc_devices  = { "Bluetooth", "UsbHost", "Wifi", null };
-            this.ps_devices = { "ac", "adapter", "apm", "battery", "usb", null };
+            this.pc_devices  = { "Bluetooth", "UsbHost", "WiFi" };
+            this.ps_devices = { "ac", "adapter", "apm", "battery", "usb" };
 
             foreach( string pc_device in pc_devices )
             {
