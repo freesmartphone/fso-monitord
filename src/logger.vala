@@ -60,14 +60,13 @@ string value_to_string( Value value )
 
     return val;
 }
-//===========================================================================
 
 
 
 //===========================================================================
 namespace FSO
 {
-    public class Logger : Object
+    public class Logger : GLib.Object
     {
         /* private */
         private FileStream stream;

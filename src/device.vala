@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
+using GLib;
+using DBus;
 
 namespace FSO
 {
@@ -30,6 +32,8 @@ namespace FSO
         [CCode (array_length = false, array_null_terminated = true)]
         private string[] ps_devices;
         private static string BUS_NAME = "org.freesmartphone.odeviced";
+
+        public static delegate void restart_daemon( string name );
 
         public Device( FSO.Logger l, DBus.Connection c)
         {

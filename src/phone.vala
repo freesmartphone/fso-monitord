@@ -21,6 +21,7 @@
  *
  */
 using GLib;
+using DBus;
 
 namespace FSO
 {

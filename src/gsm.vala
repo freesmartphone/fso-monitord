@@ -22,6 +22,7 @@
  */
 
 using GLib;
+using DBus;
 
 namespace FSO
 {
@@ -140,7 +141,7 @@ namespace FSO
             {
                 if( error != null)
                 {
-                    log("HZ", 0, "Can't get homezone: %s", error.message );
+                    debug("HZ: Can't get homezone: %s", error.message );
                 }
                 else
                 {
@@ -243,7 +244,7 @@ namespace FSO
             {
                 if( error != null)
                 {
-                    log("NETWORK", 0, "Can't get signal strength: %s", error.message );
+                    debug("NETWORK: Can't get signal strength: %s", error.message );
                     this.current_signal_strength = -1;
                 }
                 else
@@ -396,7 +397,7 @@ namespace FSO
             {
                 if( error != null)
                 {
-                    log( "Can't get authstatus: %s", 0, error.message );
+                    debug( "Can't get authstatus: %s", error.message );
                 }
                 else
                 {

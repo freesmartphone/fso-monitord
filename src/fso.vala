@@ -21,8 +21,36 @@
  *
  */
 
+using GLib;
+using DBus;
+
 namespace FSO
 {
+    //ping every 5 minutes
+    public static int timeout = 5*60;
+    //TODO: add some kind of synchronisation
+    public static void restart( string name )
+    {
+        //TODO: get this from env or somewhere else
+        //Environment.get_system_config_dirs only returns /etc/xdg
+        string path = Path.build_filename( "etc","init.d", name );
+        string command = "%s %s".printf( path, " restart");
+        string output = null;
+        string errput = null;
+
+        int status = 0;
+        try
+        {
+            Process.spawn_command_line_sync( command, out output, out errput, out status );
+        }
+        catch (GLib.SpawnError e)
+        {
+            debug( "Spawn failed: %s",e.message );
+            debug( "stdout: %s", output );
+            debug( "stderr: %s", errput );
+        }
+    }
+
     public class Framework: System
     {
         public const string BUS_NAME   = "org.freesmartphone.frameworkd";

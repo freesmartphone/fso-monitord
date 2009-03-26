@@ -38,14 +38,30 @@ namespace FSO
         protected List<Subsystem> subsystems = null;
         protected Logger logger = null;
         protected DBus.Connection con = null;
+        protected dynamic DBus.Object dbus;
         public System( FSO.Logger l, DBus.Connection c)
-        {
+        { 
             this.con = c;
             this.logger = l;
         }
         construct
-        {
+        { 
             this.subsystems = new List<Subsystem>( );
+            this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus" );
+            this.dbus.NameOwnerChenged += this.name_owner_changed;
+        }
+        //TODO: figure out the real names
+        public void name_owner_changed( DBus.Object obj, string s1, string s2, string s3)
+        {
+            debug( "NameOwnerCHanged: '%s' '%s' '%s'", s1, s2 ,s3 );
+            foreach( Subsystem s in this.subsystems )
+            {
+                s.stop( );
+            }
+            foreach( Subsystem s in this.subsystems )
+            {
+                s.run( );
+            }
         }
         public virtual void run()
         {
@@ -71,6 +87,9 @@ namespace FSO
         protected string _BUS_NAME = null;
         protected string _OBJ_PATH = null;
         protected string name = null;
+        //currently everything is provided by frameworkd
+        protected string daemon = "frameworkd";
+
 
         public Subsystem( FSO.Logger l, DBus.Connection c, string name = "" )
         {
@@ -84,6 +103,7 @@ namespace FSO
         {
             debug( "Gathering Object: BUS:%s OBJ_PATH:%s IFACE:%s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
+            this.object.NameOwnerChanged += this.name_owner_changed;
             try
             {
                 debug( "Registered to FSO version: %s", this.object.GetVersion(  ) );
@@ -93,6 +113,36 @@ namespace FSO
             {
                 debug("Ping failed. BUSNAME: %s OBJPATH: %s IFACE: %s: %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE, e.message );
             }
+            var rand = new Rand();
+            Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
+        }
+        public void name_owner_changed( dynamic DBus.Object obj, string name, string new_owner, string old_owner )
+        {
+            this.stop();
+            this.run();
+        }
+        public bool first_ping( )
+        {
+            ping();
+            Timeout.add_seconds( FSO.timeout, this.ping );
+            
+            //Don't call me again
+            return false;
+        }
+        public bool ping( )
+        {
+            try
+            {
+                debug( "Pinging %s ", this.object.get_path( ) );
+                this.object.Ping();
+            }
+            catch( GLib.Error e )
+            {
+                debug("Ping failed. BUSNAME: %s OBJPATH: %s IFACE: %s: %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE, e.message );
+                FSO.restart( this.daemon );
+            }
+            //Call me again
+            return true;
         }
         public virtual void stop()
         {

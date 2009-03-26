@@ -20,6 +20,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
+using DBus;
+using GLib;
 
 namespace FSO
 {
@@ -35,7 +37,8 @@ namespace FSO
         }
         public override void run()
         {
-            this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
+            base.run();
+            //this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
             this.object.RessourceAvailable += this.ressource_available;
             this.object.RessourceChanged += this.ressource_changed;
             this.object.SystemAction += this.system_action;
