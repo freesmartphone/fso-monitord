@@ -26,12 +26,13 @@ using DBus;
 
 namespace FSO
 {
-    public class GSM:System
+    public class GSM:FSO.System
     {
         public static const string BUS_NAME = "org.freesmartphone.ogsmd";
         public GSM( Logger l, DBus.Connection c)
         {
             base(l,c);
+            this.busname = BUS_NAME;
             this.subsystems.prepend( new Call( l,c ) );
             this.subsystems.prepend( new CellBroadcast( l,c ) );
             this.subsystems.prepend( new HomeZone( l,c ) );

@@ -39,6 +39,7 @@ namespace FSO
         protected Logger logger = null;
         protected DBus.Connection con = null;
         protected dynamic DBus.Object dbus;
+        protected string busname = null;
         public System( FSO.Logger l, DBus.Connection c)
         { 
             this.con = c;
@@ -47,20 +48,15 @@ namespace FSO
         construct
         { 
             this.subsystems = new List<Subsystem>( );
-            this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus" );
-            this.dbus.NameOwnerChenged += this.name_owner_changed;
+            this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
+            this.dbus.NameOwnerChanged += this.name_owner_changed;
         }
-        //TODO: figure out the real names
-        public void name_owner_changed( DBus.Object obj, string s1, string s2, string s3)
+        public void name_owner_changed( dynamic DBus.Object obj, string name, string new_owner, string old_owner)
         {
-            debug( "NameOwnerCHanged: '%s' '%s' '%s'", s1, s2 ,s3 );
-            foreach( Subsystem s in this.subsystems )
+            if( name == this.busname )
             {
-                s.stop( );
-            }
-            foreach( Subsystem s in this.subsystems )
-            {
-                s.run( );
+                stop();
+                run();
             }
         }
         public virtual void run()
@@ -93,7 +89,6 @@ namespace FSO
 
         public Subsystem( FSO.Logger l, DBus.Connection c, string name = "" )
         {
-            debug( "Logger: %X",( uint )l );
             this.con = c;
             this.logger = l;
             this.name = name;
@@ -103,7 +98,6 @@ namespace FSO
         {
             debug( "Gathering Object: BUS:%s OBJ_PATH:%s IFACE:%s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
-            this.object.NameOwnerChanged += this.name_owner_changed;
             try
             {
                 debug( "Registered to FSO version: %s", this.object.GetVersion(  ) );
@@ -115,11 +109,6 @@ namespace FSO
             }
             var rand = new Rand();
             Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
-        }
-        public void name_owner_changed( dynamic DBus.Object obj, string name, string new_owner, string old_owner )
-        {
-            this.stop();
-            this.run();
         }
         public bool first_ping( )
         {
@@ -158,7 +147,6 @@ namespace FSO
         {
             this.logger = l;
             this.conn = c;
-            debug( "Logger: %X %X",( uint )l, ( uint )this.logger );
             this.logger.logINFO("-------------Monitor restarted------------");
             this.systems.prepend(new FSO.Framework(this.logger, this.conn));
             this.systems.prepend(new FSO.Device(this.logger, this.conn));

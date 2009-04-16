@@ -38,6 +38,7 @@ namespace FSO
         public Device( FSO.Logger l, DBus.Connection c)
         {
             base(l,c);
+            this.busname = BUS_NAME;
             this.pc_devices  = { "Bluetooth", "UsbHost", "WiFi" };
             this.ps_devices = { "ac", "adapter", "apm", "battery", "usb" };
 

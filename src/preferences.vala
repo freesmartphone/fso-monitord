@@ -36,6 +36,7 @@ namespace FSO
         public Preferences( Logger l, DBus.Connection c )
         {
             base( l,c );
+            this.busname = BUS_NAME;
         }
         public override void run(  )
         {

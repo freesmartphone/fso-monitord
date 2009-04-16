@@ -33,7 +33,7 @@ public namespace FSO
         }
         private class Course: Subsystem
         {
-            private static const string IFACE = ".freedesktop.Gypsy.Course";
+            private static const string IFACE = "org.freedesktop.Gypsy.Course";
         }
         private class Device: Subsystem
         {

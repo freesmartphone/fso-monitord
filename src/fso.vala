@@ -62,12 +62,20 @@ namespace FSO
         public Framework( FSO.Logger l, DBus.Connection c )
         {
             base(l,c);
+            this.busname = BUS_NAME;
         }
 
         public override void run()
         {
-            this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
-            debug( "Attached to frameworkd %s. Gathering objects...", this.object.GetVersion() );
+            try
+            {
+                this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
+                debug( "Attached to frameworkd %s. Gathering objects...", this.object.GetVersion() );
+            }
+            catch (GLib.Error e)
+            {
+                debug( "Gathering frameword: %s", e.message );
+            }
         }
         public override void stop()
         {
