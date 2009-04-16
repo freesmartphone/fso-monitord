@@ -100,7 +100,6 @@ namespace FSO
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             try
             {
-                debug( "Registered to FSO version: %s", this.object.GetVersion(  ) );
                 this.object.Ping();
             }
             catch( GLib.Error e )
