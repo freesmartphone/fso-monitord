@@ -349,7 +349,7 @@ namespace FSO
             }
             private void status_changed( dynamic DBus.Object obj, string status )
             {
-                this.logger.log( "GSM:Phone" ).signal( "StatusChanged" ).name( status ).type( typeof( string ) ).from( this.cur_status ).to( status ).end(  );
+                this.logger.log( "GSM:Phone" ).signal( "StatusChanged" ).name( "status" ).type( typeof( string ) ).from( this.cur_status ).to( status ).end(  );
                 this.cur_status = status;
             }
         }
