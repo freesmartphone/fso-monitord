@@ -48,8 +48,6 @@ namespace FSO
         construct
         { 
             this.subsystems = new List<Subsystem>( );
-            this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
-            this.dbus.NameOwnerChanged += this.name_owner_changed;
         }
         public void name_owner_changed( dynamic DBus.Object obj, string name, string new_owner, string old_owner)
         {
@@ -61,6 +59,9 @@ namespace FSO
         }
         public virtual void run()
         {
+            this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
+            this.dbus.NameOwnerChanged += this.name_owner_changed;
+
             foreach( Subsystem s in this.subsystems )
             {
                 s.run();
@@ -162,6 +163,7 @@ namespace FSO
         {
             foreach( System s in this.systems )
             {
+                debug( "Starting: %s", s.get_type().name() );
                 s.run();
             }
         }
