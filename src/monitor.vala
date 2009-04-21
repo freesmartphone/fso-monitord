@@ -148,12 +148,12 @@ namespace FSO
             this.logger = l;
             this.conn = c;
             this.logger.logINFO("-------------Monitor restarted------------");
-            this.systems.prepend(new FSO.Framework(this.logger, this.conn));
             this.systems.prepend(new FSO.Device(this.logger, this.conn));
             this.systems.prepend(new FSO.GSM(this.logger, this.conn));
             this.systems.prepend(new FSO.Phone(this.logger, this.conn));
             this.systems.prepend(new FSO.Preferences(this.logger, this.conn));
             this.systems.prepend(new FSO.Usage(this.logger, this.conn));
+            this.systems.prepend(new FSO.Framework(this.logger, this.conn));
         }
         construct
         {
