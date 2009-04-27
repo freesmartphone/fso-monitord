@@ -30,15 +30,15 @@ namespace FSO
 {
     public interface IMonitor
     {
-        public abstract void run();
+        public abstract void run() throws GLib.Error;
         public abstract void stop();
     }
     public class System:GLib.Object, IMonitor
     {
-        protected List<Subsystem> subsystems = null;
+        protected List<Subsystem?> subsystems = null;
         protected Logger logger = null;
         protected DBus.Connection con = null;
-        protected dynamic DBus.Object dbus;
+        protected dynamic DBus.Object dbus = null;
         protected string busname = null;
         public System( FSO.Logger l, DBus.Connection c)
         { 
@@ -54,25 +54,48 @@ namespace FSO
             if( name == this.busname )
             {
                 stop();
-                run();
+                Timeout.add_seconds( 60, this.timeout_run );
             }
         }
-        public virtual void run()
+        public virtual void run() throws GLib.Error
         {
             this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
             this.dbus.NameOwnerChanged += this.name_owner_changed;
+            this.dbus.ref();
 
             foreach( Subsystem s in this.subsystems )
             {
-                s.run();
+                try
+                {
+                    s.run();
+                }
+                catch (GLib.Error e)
+                {
+                    debug( "Running %s failed", s.get_type().name() );
+                }
             }
         }
         public virtual void stop()
         {
+            this.dbus = null;
             foreach( Subsystem s in this.subsystems )
             {
                 s.stop();
             }
+        }
+        public bool timeout_run()
+        {
+            try
+            {
+                this.run();
+            }
+            catch (GLib.Error e)
+            {
+                debug( "failed to run %s: %s", this.get_type().name(), e.message );
+                //call me again
+                return true;
+            }
+            return false;
         }
     }
     public class Subsystem: GLib.Object, IMonitor
@@ -95,18 +118,10 @@ namespace FSO
             this.name = name;
         }
         
-        public virtual void run()
+        public virtual void run() throws GLib.Error 
         {
-            debug( "Gathering Object: BUS:%s OBJ_PATH:%s IFACE:%s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
-            try
-            {
-                this.object.Ping();
-            }
-            catch( GLib.Error e )
-            {
-                debug("Ping failed. BUSNAME: %s OBJPATH: %s IFACE: %s: %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE, e.message );
-            }
+            ping();
             var rand = new Rand();
             Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
         }
@@ -135,6 +150,7 @@ namespace FSO
         }
         public virtual void stop()
         {
+            debug( "stopping: %s on %s: %s", this.object.get_path(), this.object.get_bus_name(), this.object.get_interface() );
             this.object= null;
         }
     }
@@ -159,12 +175,18 @@ namespace FSO
         {
             this.systems = new List<System>();
         }
-        public virtual void run()
+        public virtual void run() throws GLib.Error 
         {
             foreach( System s in this.systems )
             {
-                debug( "Starting: %s", s.get_type().name() );
-                s.run();
+                try
+                {
+                    s.run();
+                }
+                catch (GLib.Error e)
+                {
+                    debug( "Starting %s failed: %s", s.get_type().name(), e.message );
+                }
             }
         }
         public virtual void stop()
@@ -182,14 +204,13 @@ namespace FSO
             {
                 var con = DBus.Bus.get( DBus.BusType.SYSTEM );
                 var monitor = new FSO.Monitor( logger, con );
-                monitor.run(  );
+                monitor.run();
                 loop.run();
             } catch (GLib.Error e) {
-                stderr.printf ("Oops: %s\n", e.message);
+                error ("Oops: %s\n", e.message);
                 return 1;
             }
             return 0;
         }
-
     }
 } 
