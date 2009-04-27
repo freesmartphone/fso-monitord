@@ -36,20 +36,25 @@ namespace FSO
             base( l,c );
             this.busname = BUS_NAME;
         }
-        public override void run( )
+        public override void run() throws GLib.Error
         {
-            debug( "Gathering Phone object..." );
+            base.run();
             this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
             this.object.Incoming += this.incoming_call;
         }
         private void incoming_call( dynamic DBus.Object obj, DBus.ObjectPath call )
         {
-            this.logger.log( "Phone" ).signal( "Incoming" ).name( "call" ).value( call ).end( );
+            this.logger.log( "Phone" ).signal( "Incoming" ).name( "call" ).value( call ).end();
             Call tmpobj = new Call( this.logger, this.con, call ); 
             this.subsystems.prepend(tmpobj);
-            tmpobj.run( );
-            //XXX: I hope this work. The Object will cleanup on its own
-            //tmpobj.ref( );
+            try
+            {
+                tmpobj.run();
+            }
+            catch (GLib.Error e)
+            {
+                debug( "running Call failed: %s", e.message );
+            }
         }
         public class Call: Subsystem
         {
@@ -63,11 +68,11 @@ namespace FSO
                 this._IFACE = IFACE;
                 this._BUS_NAME = BUS_NAME;
                 this._OBJ_PATH = name;
-                this.run(  );
+                this.run();
             }
-            public override void run( )
+            public override void run() throws GLib.Error
             {
-                base.run( );
+                base.run();
                 this.object.Incoming += this.incoming_call;
                 this.object.Release += this.release_call;
                 this.object.Outgoing += this.outgoing_call;
@@ -83,16 +88,14 @@ namespace FSO
             }
             private void incoming_call( dynamic DBus.Object obj )
             {
-                debug( "refcount: %u", this.ref_count );
-                this.logger.log( "Phone.Call" ).log( "Incoming" ).end( );
+                this.logger.log( "Phone.Call" ).log( "Incoming" ).end();
             }
             private void release_call( dynamic DBus.Object obj )
             {
-                debug( "refcount: %u", this.ref_count );
-                this.logger.log( "Phone.Call" ).log( "Release" ).end( );
+                this.logger.log( "Phone.Call" ).log( "Release" ).end();
                 try
                 {
-                    this.object.Remove( );
+                    this.object.Remove();
                 }
                 catch ( GLib.Error e )
                 {
@@ -103,13 +106,11 @@ namespace FSO
             }
             private void outgoing_call( dynamic DBus.Object obj )
             {
-                debug( "refcount: %u", this.ref_count );
-                this.logger.log( "Phone.Call" ).log( "Outgoing" ).end( );
+                this.logger.log( "Phone.Call" ).log( "Outgoing" ).end();
             }
             private void activated_call( dynamic DBus.Object obj )
             {
-                debug( "refcount: %u", this.ref_count );
-                this.logger.log( "Phone.Call" ).log( "Activated" ).end( );
+                this.logger.log( "Phone.Call" ).log( "Activated" ).end();
             }
             private void get_status( dynamic DBus.Object obj, string status, GLib.Error error )
             {
