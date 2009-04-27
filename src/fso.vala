@@ -65,8 +65,9 @@ namespace FSO
             this.busname = BUS_NAME;
         }
 
-        public override void run()
+        public override void run() throws GLib.Error
         {
+            base.run();
             try
             {
                 this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
