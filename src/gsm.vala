@@ -149,7 +149,8 @@ namespace FSO
         }
         public class MUX: Subsystem
         {
-            public static const string OBJ_PATH  = "/org/freesmartphone/GSM/Device";
+            public static const string BUS_NAME = "org.pyneo.muxer";
+            public static const string OBJ_PATH   = "/org/pyneo/Muxer"; 
             public static const string IFACE  = "org.freesmartphone.GSM.MUX";
             public MUX( FSO.Logger l, DBus.Connection c,string name = "" )
             {
