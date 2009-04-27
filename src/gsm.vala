@@ -39,7 +39,7 @@ namespace FSO
             this.subsystems.prepend( new MUX( l,c ) );
             this.subsystems.prepend( new Network( l,c ) );
             this.subsystems.prepend( new PDP( l,c ) );
-            this.subsystems.prepend( new Phone( l,c ) );
+            //this.subsystems.prepend( new Phone( l,c ) );
             this.subsystems.prepend( new SIM( l,c ) );
             this.subsystems.prepend( new SMS( l,c ) );
         }
@@ -56,11 +56,10 @@ namespace FSO
                 this._BUS_NAME = BUS_NAME;
             }
     
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.CallStatus += this.call_status_changed;
-                debug( "Started GSM.Call" );
             }
             public override void stop()
             {
@@ -86,11 +85,10 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.IncomingCellBroadcast += this.incoming_cb;
-                debug( "Started GSM.CB" );
             }
             public override void stop()
             {
@@ -120,19 +118,11 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.HomeZone += this.home_zone_changed;
-                try
-                {
-                    this.object.GetHomeZone( this.get_home_zone );
-                }
-                catch (  GLib.Error e )
-                {
-                    debug( "GetHomeZone: %s:", e.message );
-                }
-                debug( "Started GSM.HZ" );
+                this.object.GetHomeZone( this.get_home_zone );
             }
             public override void stop()
             {
@@ -159,7 +149,7 @@ namespace FSO
         }
         public class MUX: Subsystem
         {
-            public static const string OBJ_PATH   = "/org/freesmartphone/GSM/Device";
+            public static const string OBJ_PATH  = "/org/freesmartphone/GSM/Device";
             public static const string IFACE  = "org.freesmartphone.GSM.MUX";
             public MUX( FSO.Logger l, DBus.Connection c,string name = "" )
             {
@@ -168,11 +158,10 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error 
             {
                 base.run();
                 this.object.Status += this.status_changed;
-                debug( "Started GSM.MUX" );
             }
             public override void stop()
             {
@@ -199,22 +188,14 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.NetworkStatus += this.network_status_changed;
                 this.object.SignalStrength += this.network_signal_strength_changed;
                 this.object.IncomingUssd += this.network_incoming_ussd;
                 this.object.CipherStatus += this.cipher_status_changed;
-                try
-                {
-                    this.object.GetSignalStrength( this.set_signal_strength );
-                }
-                catch ( GLib.Error e )
-                {
-                    debug( "GetSignalStatus: %s", e.message );
-                }
-                debug( "Started GSM.Network" );
+                this.object.GetSignalStrength( this.set_signal_strength );
             }
             public override void stop()
             {
@@ -276,20 +257,12 @@ namespace FSO
             {
                 this.current_network_status = new HashTable<string,string>(GLib.str_hash, GLib.str_equal );
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.NetworkStatus += this.pdp_network_status_changed;
                 this.object.ContextStatus += this.pdp_context_status_changed;
-                try
-                {
-                    this.object.GetNetworkStatus (this.get_network_status);
-                }
-                catch (  GLib.Error e )
-                {
-                    debug( "GetNetworkStatus: %s",e.message );
-                }
-                debug( "Started GSM.PDP" );
+                this.object.GetNetworkStatus (this.get_network_status);
 
             }
             public override void stop()
@@ -336,11 +309,10 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.ServiceStatus += this.status_changed;
-                debug( "Started GSM.Phone" );
             }
             public override void stop()
             {
@@ -367,21 +339,13 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.AuthStatus += auth_status_changed;
                 this.object.IncomingStoredMessage += incoming_stored_message;
                 this.object.ReadyStatus += this.ready_status;
-                try
-                {
-                    this.object.GetAuthStatus ( get_auth_status );
-                }
-                catch (  GLib.Error e )
-                {
-                    debug( "GetAuthStatus: %s" , e.message );
-                }
-                debug( "Started Phone.SIM" );
+                this.object.GetAuthStatus ( get_auth_status );
             }
             public override void stop()
             {
@@ -425,11 +389,10 @@ namespace FSO
                 this._OBJ_PATH = OBJ_PATH;
                 this._BUS_NAME = BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.IncomingMessage += this.sms_incoming_message;
-                debug( "Started Phone.SMS" );
 
             }
             public override void stop()
