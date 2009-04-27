@@ -65,24 +65,14 @@ namespace FSO
             {
                 base(l,c,name);
                 this._OBJ_PATH = "%s/%s".printf(  BASE_OBJ_PATH , name);
-                debug( "OBJ_PATH: %s", this._OBJ_PATH );
                 this._IFACE = IFACE;
                 this._BUS_NAME = FSO.Device.BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.Power += this.power_changed;
-                try
-                {
-                    this.object.GetPower( this.get_power);
-                    this.object.Ping();
-                }
-                catch( GLib.Error e )
-                {
-                    debug("PowerControl for %s:%s", this.name, e.message );
-                }
-                debug( "Started Device.PowerControl for %s", this.name );
+                this.object.GetPower( this.get_power);
             }
             public override void stop()
             {
@@ -124,25 +114,16 @@ namespace FSO
             {
                 base(l,c,name);
                 this._OBJ_PATH = "%s/%s".printf( BASE_OBJ_PATH, name);
-                debug( "OBJ_PATH: %s", this._OBJ_PATH );
                 this._IFACE = IFACE;
                 this._BUS_NAME = FSO.Device.BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
                 this.object.Capacity += this.capacity_changed;
                 this.object.PowerStatus += this.power_status_changed;
-                try
-                {
-                    this.object.GetCapacity( this.get_capacity );
-                    this.object.GetPowerStatus( this.get_power_status );
-                }
-                catch( GLib.Error e )
-                {
-                    debug("PowerSupply for %s: %s", this.name, e.message );
-                }
-                debug( "Started Device.PowerSupply for %s", this.name );
+                this.object.GetCapacity( this.get_capacity );
+                this.object.GetPowerStatus( this.get_power_status );
             }
             public override void stop()
             {
@@ -199,12 +180,10 @@ namespace FSO
                 this._OBJ_PATH = "/org/freesmartphone/Device/Input";
                 this._BUS_NAME = FSO.Device.BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
-                debug("Getting input Object...");
                 this.object.Event += this.input_event;
-                debug( "Started Device.Input" );
             }
             public override void stop()
             {
@@ -233,21 +212,13 @@ namespace FSO
                 this._OBJ_PATH = "/org/freesmartphone/Device/Audio";
                 this._BUS_NAME = FSO.Device.BUS_NAME;
             }
-            public override void run()
+            public override void run() throws GLib.Error
             {
                 base.run();
 
                 this.object.SoundStatus += this.sound_status_changed;
                 this.object.Scenario += this.scenario_changed;
-                try
-                {
-                    this.object.GetScenario ( this.get_scenario );
-                }
-                catch( GLib.Error e )
-                {
-                    debug("Can't get Scenario: %s", e.message );
-                }
-                debug( "Started Device.Audio" );
+                this.object.GetScenario ( this.get_scenario );
             }
             public override void stop()
             {
