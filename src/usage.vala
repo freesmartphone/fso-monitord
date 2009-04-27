@@ -36,23 +36,15 @@ namespace FSO
             base(l,c);
             this.busname = BUS_NAME;
         }
-        public override void run()
+        public override void run() throws GLib.Error
         {
             base.run();
-            //this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
+            this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
             this.object.RessourceAvailable += this.ressource_available;
             this.object.RessourceChanged += this.ressource_changed;
             this.object.SystemAction += this.system_action;
-            try
-            {
-                this.object.Ping();
-            }
-            catch (GLib.Error e)
-            {
-                debug( "Ping failed: %s", e.message );
-            }
         }
-        public override void stop(  )
+        public override void stop()
         {
             this.object.RessourceAvailable -= this.ressource_available;
             this.object.RessourceChanged -= this.ressource_changed;
