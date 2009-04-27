@@ -38,18 +38,11 @@ namespace FSO
             base( l,c );
             this.busname = BUS_NAME;
         }
-        public override void run(  )
+        public override void run() throws GLib.Error
         {
-            debug( "Gathering preferences ..." );
+            base.run();
             this.object = this.con.get_object( BUS_NAME, OBJ_PATH, IFACE );
-            try
-            {
-                this.object.GetServices( this.get_services );
-            }
-            catch (  GLib.Error e )
-            {
-                debug( "Retrieving Info for services/profiles: %s", e.message );
-            }
+            this.object.GetServices( this.get_services );
         }
         private void get_services( dynamic DBus.Object obj, string[] services, GLib.Error error )
         {
@@ -63,6 +56,7 @@ namespace FSO
                 {
                     try
                     {
+                        debug( "Get Service: %s", service );
                         this.object.GetService(  service, this.get_service );
                     }
                     catch (  GLib.Error e )
@@ -82,7 +76,14 @@ namespace FSO
             {
                 var tmpobj = new Service( this.logger, this.con, service );
                 this.subsystems.prepend( tmpobj );
-                tmpobj.run(  );
+                try
+                {
+                    tmpobj.run();
+                }
+                catch (GLib.Error e)
+                {
+                    debug( "Starting Service %s failed: %s", service, e.message );
+                }
             }
         }
 
@@ -97,20 +98,20 @@ namespace FSO
                 this._BUS_NAME = BUS_NAME;
                 this._IFACE = IFACE;
             }
-            public override void run(  )
+            public override void run() throws GLib.Error
             {
                 debug( "Gathering Service object for %s", this.name );
-                base.run(  );
+                base.run();
                 this.object.Notify += this.service_notify;
             }
-            public override void stop(  )
+            public override void stop()
             {
                 this.object.Notify -= this.service_notify;
-                base.stop(  );
+                base.stop();
             }
             private void service_notify( dynamic DBus.Object obj, string key, Value v )
             {
-                this.logger.log( "Preferences.Service" ).signal( "Notify" ).name( key ).type( v.type(  ) ).value( value_to_string( v ) ).end(  );
+                this.logger.log( "Preferences.Service" ).signal( "Notify" ).name( key ).type( v.type() ).value( value_to_string( v ) ).end();
             }
         }
     }
