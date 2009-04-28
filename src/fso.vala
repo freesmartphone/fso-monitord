@@ -28,9 +28,20 @@ namespace FSO
 {
     //ping every 5 minutes
     public static int timeout = 5*60;
-    //TODO: add some kind of synchronisation
+    public static int restart_timeout = 2*60;
+    public static SList<string> stopped_daemons;
+    public static bool remove_daemon( GLib.Object? dummy )
+    {
+        //no pop_front
+        stopped_daemons.remove( stopped_daemons.data );
+        return false;
+    }
     public static void restart( string name )
     {
+        if( stopped_daemons == null )
+        {
+            stopped_daemons = new SList<string>();
+        }
         //TODO: get this from env or somewhere else
         //Environment.get_system_config_dirs only returns /etc/xdg
         string path = Path.build_filename( "/etc","init.d", name );
@@ -39,18 +50,36 @@ namespace FSO
         string errput = null;
 
         int status = 0;
-        try
+        if( ! list_contains( stopped_daemons, name ) )
         {
-            Process.spawn_command_line_sync( command, out output, out errput, out status );
+            try
+            {
+                stopped_daemons.append( name );
+                Timeout.add_seconds( restart_timeout, ( GLib.SourceFunc )remove_daemon );
+                Process.spawn_command_line_sync( command, out output, out errput, out status );
+            }
+            catch (GLib.SpawnError e)
+            {
+                debug( "Spawn failed: %s",e.message );
+                debug( "stdout: %s", output );
+                debug( "stderr: %s", errput );
+            }
         }
-        catch (GLib.SpawnError e)
-        {
-            debug( "Spawn failed: %s",e.message );
-            debug( "stdout: %s", output );
-            debug( "stderr: %s", errput );
-        }
+        else
+             debug( "%s already restarted", name );
     }
 
+    public static bool list_contains( SList<string>? the_list, string needle )
+    {
+        if( the_list == null )
+             return false;
+        foreach( string s in the_list )
+        {
+            if( s == needle )
+                 return true;
+        }
+        return false;
+    }
     public class Framework: System
     {
         public const string BUS_NAME   = "org.freesmartphone.frameworkd";
