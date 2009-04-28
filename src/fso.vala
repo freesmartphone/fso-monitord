@@ -33,7 +33,7 @@ namespace FSO
     {
         //TODO: get this from env or somewhere else
         //Environment.get_system_config_dirs only returns /etc/xdg
-        string path = Path.build_filename( "etc","init.d", name );
+        string path = Path.build_filename( "/etc","init.d", name );
         string command = "%s %s".printf( path, " restart");
         string output = null;
         string errput = null;
