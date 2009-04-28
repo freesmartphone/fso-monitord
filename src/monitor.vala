@@ -61,7 +61,6 @@ namespace FSO
         {
             this.dbus = this.con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
             this.dbus.NameOwnerChanged += this.name_owner_changed;
-            this.dbus.ref();
 
             foreach( Subsystem s in this.subsystems )
             {
@@ -107,6 +106,7 @@ namespace FSO
         protected string _BUS_NAME = null;
         protected string _OBJ_PATH = null;
         protected string name = null;
+        protected uint timer = 0;
         //currently everything is provided by frameworkd
         protected string daemon = "frameworkd";
 
@@ -123,12 +123,12 @@ namespace FSO
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             ping();
             var rand = new Rand();
-            Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
+            this.timer = Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
         }
         public bool first_ping( )
         {
             ping();
-            Timeout.add_seconds( FSO.timeout, this.ping );
+            this.timer = Timeout.add_seconds( FSO.timeout, this.ping );
             
             //Don't call me again
             return false;
@@ -151,6 +151,7 @@ namespace FSO
         public virtual void stop()
         {
             debug( "stopping: %s on %s: %s", this.object.get_path(), this.object.get_bus_name(), this.object.get_interface() );
+            Source.remove( this.timer );
             this.object= null;
         }
     }
