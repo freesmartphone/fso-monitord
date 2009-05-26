@@ -143,7 +143,7 @@ namespace FSO
             catch( GLib.Error e )
             {
                 debug("Ping failed. BUSNAME: %s OBJPATH: %s IFACE: %s: %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE, e.message );
-                FSO.restart( this.daemon );
+                FSO.restart( this._BUS_NAME );
             }
             //Call me again
             return true;

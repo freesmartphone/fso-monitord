@@ -23,6 +23,7 @@
 
 using GLib;
 using DBus;
+using Posix;
 
 namespace FSO
 {
@@ -42,10 +43,6 @@ namespace FSO
         {
             stopped_daemons = new SList<string>();
         }
-        //TODO: get this from env or somewhere else
-        //Environment.get_system_config_dirs only returns /etc/xdg
-        string path = Path.build_filename( "/etc","init.d", name );
-        string command = "%s %s".printf( path, " restart");
         string output = null;
         string errput = null;
 
@@ -54,9 +51,16 @@ namespace FSO
         {
             try
             {
+                var con = DBus.Bus.get( BusType.SYSTEM );
+                dynamic DBus.Object dbus = con.get_object( "org.freedesktop.DBus", "/org/freedesktop/DBus", "org.freedesktop.DBus" );
+                uint pid = dbus.GetConnectionUnixProcessID( name );
+                string[] cmd_split = get_cmd_for_pid( pid );
+                Posix.kill( (Posix.pid_t)pid, 9 );
+                string cmd = string.joinv( " ", cmd_split );
+
                 stopped_daemons.append( name );
                 Timeout.add_seconds( restart_timeout, ( GLib.SourceFunc )remove_daemon );
-                Process.spawn_command_line_sync( command, out output, out errput, out status );
+                Process.spawn_command_line_sync( cmd, out output, out errput, out status );
             }
             catch (GLib.SpawnError e)
             {
@@ -64,9 +68,52 @@ namespace FSO
                 debug( "stdout: %s", output );
                 debug( "stderr: %s", errput );
             }
+            catch ( DBus.Error ex )
+            {
+                debug( "DBus error for %s: %s", name, ex.message );
+            }
         }
         else
              debug( "%s already restarted", name );
+    }
+
+    public static string[] get_cmd_for_pid( uint pid )
+    {
+        string[] lines = new string[0];
+        int fd = 0;
+        if( ( fd = Posix.open(  "/proc/%u/cmdline".printf( pid ) , Posix.O_RDONLY) ) > 0)
+        {
+            char[] buf = new char[4096];
+            size_t len = 0;
+            if( ( len = Posix.read( fd, buf, 4096 ) ) > 0 )
+            {
+                char[] tmp = new char[1024];
+                int tmppos = 0;
+                for( int bufpos = 0; bufpos < len; bufpos ++ )
+                {
+                    tmp[tmppos] = buf[bufpos];
+                    if( tmp[tmppos] == '\0' )
+                    {
+                        lines += Posix.strdup( ( string )tmp );
+                        tmppos = 0;
+                    }
+                    else
+                         tmppos ++;
+                }
+                lines += null;
+            }
+            else
+            {
+                debug( "Read for pid %u failed: %s", pid, Posix.strerror( Posix.errno ) );
+                lines = null;
+            }
+        }
+        else
+        {
+            debug( "open for pid %u failed: %s", pid, Posix.strerror( Posix.errno ) );
+            lines = null;
+        }
+        return lines;
     }
 
     public static bool list_contains( SList<string>? the_list, string needle )

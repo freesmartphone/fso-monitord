@@ -32,7 +32,7 @@ fso_monitord_SOURCES = \
 	$(NULL)
 
 src/.vala.stamp: $(fso_monitord_VALASOURCES)
-	$(VALAC) -c --pkg  dbus-glib-1 --save-temps --basedir=$(top_srcdir) $^
+	$(VALAC) -c --pkg  dbus-glib-1 --pkg posix --save-temps --basedir=$(top_srcdir) $^
 	touch $@
 
 fso_monitord_LDADD = \
