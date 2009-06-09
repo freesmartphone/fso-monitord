@@ -72,6 +72,10 @@ namespace FSO
             {
                 debug( "DBus error for %s: %s", name, ex.message );
             }
+            catch( GLib.Error ge )
+            {
+                debug( "General Error: %s", ge.message );
+            }
         }
         else
              debug( "%s already restarted", name );
