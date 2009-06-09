@@ -245,7 +245,7 @@ namespace FSO
         public class PDP: Subsystem
         {
             public static const string OBJ_PATH   = "/org/freesmartphone/GSM/Device";
-            public static const string IFACE  = "org.freesmartphone.GSM.Pdp";
+            public static const string IFACE  = "org.freesmartphone.GSM.PDP";
             private  HashTable<string,string> current_network_status;
             public PDP( FSO.Logger l, DBus.Connection c,string name = "")
             {
