@@ -110,6 +110,9 @@ namespace FSO
         //currently everything is provided by frameworkd
         protected string daemon = "frameworkd";
 
+        private const string PEER_IFACE = "org.freedesktop.DBus.Peer";
+        private dynamic DBus.Object peer;
+
 
         public Subsystem( FSO.Logger l, DBus.Connection c, string name = "" )
         {
@@ -122,6 +125,7 @@ namespace FSO
         {
             debug( "Subsystem.run: %s %s %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
+            this.peer = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, PEER_IFACE );
             ping();
             var rand = new Rand();
             this.timer = Timeout.add_seconds( rand.int_range( 10, FSO.timeout), this.first_ping );
@@ -138,8 +142,8 @@ namespace FSO
         {
             try
             {
-                debug( "Pinging %s ", this.object.get_path( ) );
-                this.object.Ping();
+                debug( "Pinging %s ", this.peer.get_path( ) );
+                this.peer.Ping();
             }
             catch( GLib.Error e )
             {
