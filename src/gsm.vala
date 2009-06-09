@@ -121,8 +121,8 @@ namespace FSO
             public override void run() throws GLib.Error
             {
                 base.run();
-                this.object.HomeZone += this.home_zone_changed;
-                this.object.GetHomeZone( this.get_home_zone );
+                this.object.HomeZoneStatus += this.home_zone_changed;
+                this.object.GetHomeZoneStatus( this.get_home_zone );
             }
             public override void stop()
             {
