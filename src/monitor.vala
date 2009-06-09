@@ -120,6 +120,7 @@ namespace FSO
         
         public virtual void run() throws GLib.Error 
         {
+            debug( "Subsystem.run: %s %s %s", this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             this.object = this.con.get_object( this._BUS_NAME, this._OBJ_PATH, this._IFACE );
             ping();
             var rand = new Rand();
