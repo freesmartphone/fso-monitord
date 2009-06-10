@@ -34,6 +34,7 @@ namespace FSO
     public static bool remove_daemon( GLib.Object? dummy )
     {
         //no pop_front
+        debug("removing %s from stopped_daemons",stopped_daemons.data );
         stopped_daemons.remove( stopped_daemons.data );
         return false;
     }
@@ -58,7 +59,7 @@ namespace FSO
                 Posix.kill( (Posix.pid_t)pid, 9 );
                 string cmd = string.joinv( " ", cmd_split );
 
-                stopped_daemons.append( name );
+                stopped_daemons.append( cmd_split[0] );
                 Timeout.add_seconds( restart_timeout, ( GLib.SourceFunc )remove_daemon );
                 Process.spawn_command_line_sync( cmd, out output, out errput, out status );
             }
